@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday! 🎁</title>
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: rgba(22, 27, 34, 0.92);
+      --accent-color: #f43f5e;
+      --accent-hover: #e11d48;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #30363d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 30%, rgba(244, 63, 94, 0.12) 0%, transparent 70%),
+        radial-gradient(circle at 20% 80%, rgba(253, 224, 71, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+    }
+
+    body.in-card * {
+      cursor: none !important;
+    }
+
+    #bgCanvas, #fxCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+    #bgCanvas { z-index: 0; }
+    #fxCanvas { z-index: 999999; }
+
+    /* BIRTHDAY BUNTING BANNER */
+    .birthday-bunting {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+      justify-content: space-around;
+      padding: 0 10px;
+    }
+
+    .flag {
+      width: 0;
+      height: 0;
+      border-left: 22px solid transparent;
+      border-right: 22px solid transparent;
+      border-top: 50px solid #f43f5e;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+      animation: flagSway 3s ease-in-out infinite alternate;
+      transform-origin: top center;
+    }
+
+    .flag:nth-child(2n) { border-top-color: #fde047; animation-delay: 0.3s; }
+    .flag:nth-child(3n) { border-top-color: #38bdf8; animation-delay: 0.6s; }
+    .flag:nth-child(4n) { border-top-color: #a855f7; animation-delay: 0.9s; }
+    .flag:nth-child(5n) { border-top-color: #4ade80; animation-delay: 1.2s; }
+
+    @keyframes flagSway {
+      0% { transform: rotate(-5deg); }
+      100% { transform: rotate(5deg); }
+    }
+
+    /* FLOATING BIRTHDAY BALLOONS */
+    .balloon-container {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .balloon {
+      position: absolute;
+      bottom: -120px;
+      width: 50px;
+      height: 65px;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      opacity: 0.85;
+      animation: floatUp 14s linear infinite;
+    }
+
+    .balloon::before {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 7px solid inherit;
+    }
+
+    .balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -22px;
+      left: 50%;
+      width: 2px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .b1 { left: 8%; background: #f43f5e; animation-delay: 0s; animation-duration: 13s; }
+    .b2 { left: 22%; background: #38bdf8; animation-delay: 3s; animation-duration: 16s; }
+    .b3 { left: 78%; background: #fde047; animation-delay: 1s; animation-duration: 14s; }
+    .b4 { left: 90%; background: #a855f7; animation-delay: 5s; animation-duration: 12s; }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-50vh) rotate(12deg); }
+      100% { transform: translateY(-115vh) rotate(-12deg); }
+    }
+
+    /* STAGE 1: HARD MAZE MINI-GAME SCREEN */
+    #mazeStage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+      width: 100%;
+      max-width: 520px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(14px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    #mazeStage.hidden {
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .maze-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fda4af;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .maze-instructions {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 15px;
+      line-height: 1.4;
+      transition: color 0.3s ease;
+    }
+
+    .maze-instructions.chaser-alert {
+      color: #f43f5e;
+      font-weight: 700;
+      animation: alertPulse 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes alertPulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.03); }
+    }
+
+    #mazeBoard {
+      display: grid;
+      grid-template-columns: repeat(17, 1fr);
+      gap: 1.5px;
+      background-color: #161b22;
+      padding: 8px;
+      border-radius: 12px;
+      border: 2px solid var(--border-color);
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+      width: 100%;
+      aspect-ratio: 1;
+    }
+
+    .cell {
+      border-radius: 2px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.9rem;
+      user-select: none;
+      position: relative;
+    }
+
+    .cell.wall { background-color: #30363d; }
+    .cell.path { background-color: #0d1117; }
+    .cell.start { background-color: rgba(244, 63, 94, 0.15); }
+    .cell.goal { background-color: rgba(253, 224, 71, 0.2); }
+    
+    .cell.blocker-wall { 
+      background-color: #fb923c !important; 
+      border: 1px solid #f97316;
+      box-shadow: 0 0 5px rgba(251, 146, 60, 0.6);
+    }
+
+    .cell .maze-avatar-icon {
+      width: 90%;
+      height: 90%;
+      image-rendering: pixelated;
+    }
+
+    /* D-PAD MOBILE CONTROLS */
+    .dpad-container {
+      display: grid;
+      grid-template-columns: repeat(3, 46px);
+      grid-template-rows: repeat(3, 46px);
+      gap: 6px;
+      margin-top: 15px;
+    }
+
+    .dpad-btn {
+      background: #21262d;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 1.1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dpad-btn:active {
+      background: var(--accent-color);
+      transform: scale(0.95);
+    }
+
+    .btn-up { grid-column: 2; grid-row: 1; }
+    .btn-left { grid-column: 1; grid-row: 2; }
+    .btn-right { grid-column: 3; grid-row: 2; }
+    .btn-down { grid-column: 2; grid-row: 3; }
+
+    /* CUSTOM WIN POPUP MODAL SCREEN */
+    .win-popup-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(13, 17, 23, 0.95);
+      backdrop-filter: blur(10px);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 999999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      padding: 20px;
+    }
+
+    .win-popup-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .win-popup-card {
+      background-color: var(--card-bg);
+      border: 2px solid var(--accent-color);
+      border-radius: 20px;
+      padding: 30px 25px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(244, 63, 94, 0.3);
+      transform: scale(0.85);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .win-popup-overlay.active .win-popup-card {
+      transform: scale(1);
+    }
+
+    .win-avatar-box {
+      width: 70px;
+      height: 85px;
+      margin: 0 auto 15px auto;
+      animation: avatarPopJump 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes avatarPopJump {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-12px); }
+    }
+
+    .win-popup-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fda4af;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .win-popup-subtext {
+      font-size: 1.05rem;
+      color: #f8fafc;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    /* STAGE 2: MAIN BIRTHDAY CARD STAGE */
+    #cardStage {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      width: 100%;
+      max-width: 700px;
+      z-index: 2;
+    }
+
+    #cardStage.active {
+      display: block;
+      opacity: 1;
+    }
+
+    #cursorAvatar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 55px;
+      height: 75px;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease;
+      display: none;
+    }
+
+    body.in-card #cursorAvatar { display: block; }
+    body.is-loading #cursorAvatar { opacity: 0; }
+
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .avatar-front { display: block; }
+    .avatar-side { display: none; }
+    .avatar-kneel { display: none; }
+
+    #cursorAvatar.walking .avatar-front,
+    #cursorAvatar.kneeling .avatar-front { display: none; }
+
+    #cursorAvatar.walking .avatar-side { display: block; }
+    #cursorAvatar.kneeling .avatar-kneel { display: block; }
+
+    #cursorAvatar.facing-left .avatar-inner { transform: scaleX(-1); }
+    #cursorAvatar.facing-right .avatar-inner { transform: scaleX(1); }
+
+    #cursorAvatar.idle .avatar-front {
+      animation: frontBreathing 2s ease-in-out infinite alternate;
+      transform-origin: center bottom;
+    }
+
+    #cursorAvatar.idle .girl-blush {
+      opacity: 0.3;
+      transition: opacity 0.5s ease;
+    }
+
+    #cursorAvatar.idle.shy .girl-arms-front {
+      animation: moveHandsToCrouch 0.6s ease-out forwards;
+    }
+
+    #cursorAvatar.idle.shy .girl-blush {
+      opacity: 1;
+      animation: blushPulse 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes frontBreathing {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(1px); }
+    }
+
+    @keyframes moveHandsToCrouch {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(2px) scale(0.95); }
+    }
+
+    @keyframes blushPulse {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    #cursorAvatar.walking .avatar-side {
+      animation: bodyBob 0.22s steps(2, end) infinite;
+    }
+
+    #cursorAvatar.walking .side-leg-front {
+      animation: legMoveFront 0.22s steps(2, end) infinite alternate;
+      transform-origin: 17px 24px;
+    }
+
+    #cursorAvatar.walking .side-leg-back {
+      animation: legMoveBack 0.22s steps(2, end) infinite alternate;
+      transform-origin: 13px 24px;
+    }
+
+    @keyframes legMoveFront { 0% { transform: rotate(-20deg); } 100% { transform: rotate(20deg); } }
+    @keyframes legMoveBack { 0% { transform: rotate(20deg); } 100% { transform: rotate(-20deg); } }
+    @keyframes bodyBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+    #cursorAvatar.kneeling .avatar-kneel {
+      animation: kneelBreathing 1.5s ease-in-out infinite alternate;
+      transform-origin: center bottom;
+    }
+
+    @keyframes kneelBreathing {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(1px); }
+    }
+
+    #cursorAvatar.jumping .avatar-front {
+      animation: avatarJumpGroup 0.4s ease-in-out infinite alternate;
+    }
+
+    #cursorAvatar.jumping .girl-hair-front {
+      animation: hairJumpBounce 0.4s ease-in-out infinite alternate;
+      transform-origin: center top;
+    }
+
+    @keyframes avatarJumpGroup {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-18px); }
+    }
+
+    @keyframes hairJumpBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(3px); }
+    }
+
+    .container {
+      width: 100%;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 35px 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      position: relative;
+      backdrop-filter: blur(14px);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .container.box-shift-1 { animation: boxNudge1 0.5s ease-in-out forwards; }
+    .container.box-shift-2 { animation: boxNudge2 0.5s ease-in-out forwards; }
+    .container.box-shift-3 { animation: boxNudge3 0.5s ease-in-out forwards; }
+    .container.box-shift-4 { animation: boxNudge4 0.5s ease-in-out forwards; }
+
+    @keyframes boxNudge1 {
+      0% { transform: scale(1) rotate(0deg); }
+      30% { transform: scale(0.97) translateY(-10px) rotate(-2deg); }
+      70% { transform: scale(1.02) translateY(5px) rotate(1deg); }
+      100% { transform: scale(1) translateY(0) rotate(0deg); }
+    }
+
+    @keyframes boxNudge2 {
+      0% { transform: scale(1) rotate(0deg); }
+      30% { transform: scale(0.97) translateX(12px) rotate(2deg); }
+      70% { transform: scale(1.02) translateX(-6px) rotate(-1deg); }
+      100% { transform: scale(1) translateX(0) rotate(0deg); }
+    }
+
+    @keyframes boxNudge3 {
+      0% { transform: scale(1) rotate(0deg); }
+      30% { transform: scale(0.97) translateY(12px) rotate(-2deg); }
+      70% { transform: scale(1.02) translateY(-6px) rotate(1.5deg); }
+      100% { transform: scale(1) translateY(0) rotate(0deg); }
+    }
+
+    @keyframes boxNudge4 {
+      0% { transform: scale(1) rotate(0deg); }
+      30% { transform: scale(1.03) rotate(-3deg); }
+      60% { transform: scale(0.98) rotate(2deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .phase-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 15px;
+    }
+
+    .step-badge {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.3s ease;
+    }
+
+    .step-badge.active { color: var(--accent-color); }
+
+    .phase-content { display: none; }
+    .phase-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1, h2 { color: var(--text-main); margin-bottom: 12px; }
+    p { color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+
+    .p1-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fda4af;
+      text-align: center;
+      margin-bottom: 12px;
+      margin-top: 10px;
+    }
+
+    .p1-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 45px;
+    }
+
+    .gift-btn-container {
+      position: relative;
+      width: 100%;
+      margin: 20px 0 10px 0;
+    }
+
+    .gift-btn {
+      position: relative;
+      width: 100%;
+      padding: 22px;
+      background: linear-gradient(135deg, #f43f5e, #be123c);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+      pointer-events: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .gift-btn.unlocked { pointer-events: auto !important; }
+
+    .gift-btn-container.piece-shake { animation: pieceShake 0.15s ease-in-out; }
+
+    @keyframes pieceShake {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-3px, 2px) rotate(-1deg); }
+      50% { transform: translate(3px, -2px) rotate(1deg); }
+      75% { transform: translate(-2px, -1px) rotate(-0.5deg); }
+    }
+
+    .gift-btn.shaking { animation: revealShake 0.4s ease-in-out; }
+
+    @keyframes revealShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px) rotate(-1deg); }
+      40% { transform: translateX(8px) rotate(1deg); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+
+    #particleCanvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 20;
+    }
+
+    .decomp-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      z-index: 10;
+      pointer-events: auto;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .decomp-piece {
+      background-color: #e11d48;
+      border: none; outline: none; box-shadow: none;
+      transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.65s ease;
+    }
+
+    .decomp-piece.ribbon-v { background-color: #fde047; }
+
+    .decomp-piece:nth-child(1) { clip-path: polygon(0% 0%, 108% 0%, 82% 65%, 102% 108%, 0% 92%); }
+    .decomp-piece:nth-child(2) { clip-path: polygon(-8% 0%, 105% 0%, 112% 48%, 88% 105%, -18% 65%); }
+    .decomp-piece:nth-child(3) { clip-path: polygon(-12% 0%, 115% 0%, 92% 52%, 108% 105%, -12% 48%); }
+    .decomp-piece:nth-child(4) { clip-path: polygon(-15% 0%, 108% 0%, 118% 58%, 90% 105%, -8% 52%); }
+    .decomp-piece:nth-child(5) { clip-path: polygon(-10% 0%, 100% 0%, 100% 105%, -10% 58%); }
+
+    .decomp-piece:nth-child(6) { clip-path: polygon(0% -8%, 102% -8%, 85% 55%, 105% 100%, 0% 100%); }
+    .decomp-piece:nth-child(7) { clip-path: polygon(-2% -5%, 118% -8%, 95% 42%, 108% 100%, -15% 100%); }
+    .decomp-piece:nth-child(8) { clip-path: polygon(-8% -5%, 112% -5%, 105% 58%, 92% 100%, -5% 100%); }
+    .decomp-piece:nth-child(9) { clip-path: polygon(-10% -8%, 108% -2%, 115% 62%, 102% 100%, -8% 100%); }
+    .decomp-piece:nth-child(10) { clip-path: polygon(-2% -5%, 100% -8%, 100% 100%, -15% 100%); }
+
+    .decomp-piece.shredded { opacity: 0; }
+    .decomp-piece:nth-child(1).shredded { transform: translate(-110px, -80px) rotate(-65deg) scale(0.15); }
+    .decomp-piece:nth-child(2).shredded { transform: translate(-40px, -110px) rotate(45deg) scale(0.15); }
+    .decomp-piece:nth-child(3).shredded { transform: translate(10px, -120px) rotate(-35deg) scale(0.15); }
+    .decomp-piece:nth-child(4).shredded { transform: translate(50px, -100px) rotate(55deg) scale(0.15); }
+    .decomp-piece:nth-child(5).shredded { transform: translate(110px, -70px) rotate(-50deg) scale(0.15); }
+    .decomp-piece:nth-child(6).shredded { transform: translate(-110px, 80px) rotate(70deg) scale(0.15); }
+    .decomp-piece:nth-child(7).shredded { transform: translate(-50px, 110px) rotate(-40deg) scale(0.15); }
+    .decomp-piece:nth-child(8).shredded { transform: translate(10px, 120px) rotate(25deg) scale(0.15); }
+    .decomp-piece:nth-child(9).shredded { transform: translate(45px, 105px) rotate(-60deg) scale(0.15); }
+    .decomp-piece:nth-child(10).shredded { transform: translate(110px, 80px) rotate(35deg) scale(0.15); }
+
+    .input-group { margin-bottom: 20px; }
+    label { display: block; font-size: 1.05rem; margin-bottom: 12px; color: var(--text-main); font-weight: 600; line-height: 1.5; }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus { border-color: var(--accent-color); }
+
+    button.std-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background-color 0.2s, transform 0.1s;
+      cursor: pointer !important;
+    }
+
+    button.std-btn:active { transform: scale(0.98); }
+
+    /* QUESTION 3: EXTRA WIDE YES & TINY NO BUTTON */
+    .q3-choice-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 20px;
+      position: relative;
+      min-height: 65px;
+    }
+
+    .btn-yes {
+      flex: 4 !important;
+      padding: 18px 24px !important;
+      font-size: 1.2rem !important;
+      font-weight: 800 !important;
+      background-color: #22c55e !important;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-no {
+      flex: 1 !important;
+      max-width: 70px !important;
+      padding: 10px 8px !important;
+      font-size: 0.85rem !important;
+      background-color: #ef4444 !important;
+      position: relative;
+      transition: transform 0.15s ease, left 0.2s ease, top 0.2s ease;
+    }
+
+    .error-msg { color: #fb7185; font-size: 0.85rem; margin-top: 8px; display: none; }
+    .progress-bar-text { font-size: 0.8rem; color: var(--accent-color); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+
+    /* PHOTO GALLERY GRID STYLES */
+    .gallery-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fda4af;
+      margin: 30px 0 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .photo-card {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      border: 2px solid var(--border-color);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .photo-card:hover {
+      transform: scale(1.04);
+      border-color: var(--accent-color);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* FULL-SCREEN LIGHTBOX MODAL */
+    .lightbox-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(0,0,0,0.92);
+      backdrop-filter: blur(10px);
+      z-index: 9999999;
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox-modal.active {
+      opacity: 1; pointer-events: auto;
+    }
+
+    .lightbox-modal img {
+      max-width: 90%;
+      max-height: 85vh;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(244, 63, 94, 0.4);
+      border: 2px solid var(--accent-color);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px; right: 25px;
+      color: white; font-size: 2rem;
+      font-weight: bold;
+      user-select: none;
+    }
+
+    /* LOADING SCREEN STYLES */
+    .loading-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(13, 17, 23, 0.96);
+      backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      z-index: 99998; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    }
+
+    .loading-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .walking-track {
+      width: 320px; height: 90px; position: relative; border-bottom: 4px solid #475569; margin-bottom: 20px; overflow: hidden;
+      background: linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.05) 50%); background-size: 12px 100%;
+    }
+
+    .avatar-wrapper { 
+      position: absolute; 
+      bottom: 0; 
+      left: -60px; 
+      width: 60px; 
+      height: 75px; 
+    }
+
+    .loading-overlay.active .avatar-wrapper { 
+      animation: girlWalkOverlay 5s linear forwards; 
+    }
+
+    @keyframes girlWalkOverlay { 
+      0% { left: -60px; } 
+      100% { left: 320px; } 
+    }
+
+    .loading-overlay.active .loader-walking-body {
+      animation: bodyBob 0.22s steps(2, end) infinite;
+    }
+
+    .loading-overlay.active .loader-leg-front {
+      animation: legMoveFront 0.22s steps(2, end) infinite alternate;
+      transform-origin: 17px 24px;
+    }
+
+    .loading-overlay.active .loader-leg-back {
+      animation: legMoveBack 0.22s steps(2, end) infinite alternate;
+      transform-origin: 13px 24px;
+    }
+
+    .progress-bar-container { width: 220px; height: 8px; background-color: var(--bg-color); border-radius: 4px; overflow: hidden; margin-top: 12px; border: 2px solid var(--border-color); }
+    .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #f43f5e, #fb7185); transition: width 5s linear; }
+    .loading-text { color: #f8fafc; font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; font-family: monospace; text-align: center; padding: 0 10px; }
+
+    .timeline { border-left: 2px solid var(--accent-color); padding-left: 20px; margin: 20px 0; }
+    .timeline-item { margin-bottom: 25px; position: relative; }
+    .timeline-item::before { content: ''; position: absolute; left: -26px; top: 4px; width: 10px; height: 10px; background-color: var(--accent-color); border-radius: 50%; }
+    .timeline-date { font-size: 0.8rem; color: var(--accent-color); font-weight: 700; text-transform: uppercase; }
+    .timeline-title { font-size: 1.1rem; font-weight: 600; margin: 2px 0 6px 0; }
+    audio { width: 100%; margin-top: 10px; border-radius: 8px; }
+
+    .letter-box { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; font-family: Georgia, serif; line-height: 1.8; color: #e2e8f0; }
+    .signature { text-align: right; margin-top: 20px; font-style: italic; color: var(--accent-color); font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+  <canvas id="fxCanvas"></canvas>
+
+  <div class="birthday-bunting">
+    <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+    <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+    <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+    <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+  </div>
+
+  <div class="balloon-container">
+    <div class="balloon b1"></div><div class="balloon b2"></div>
+    <div class="balloon b3"></div><div class="balloon b4"></div>
+  </div>
+
+  <!-- LIGHTBOX MODAL FOR FULLSCREEN PHOTOS -->
+  <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightboxImg" src="" alt="Enlarged Memory">
+  </div>
+
+  <!-- WIN POPUP MODAL SCREEN -->
+  <div class="win-popup-overlay" id="winPopup">
+    <div class="win-popup-card">
+      <div class="win-avatar-box">
+        <svg viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
+          <rect x="9" y="6" width="14" height="14" fill="#3D231A"/>
+          <rect x="12" y="24" width="3" height="7" fill="#E8AA7A"/>
+          <rect x="17" y="24" width="3" height="7" fill="#E8AA7A"/>
+          <rect x="12" y="31" width="3" height="3" fill="#FFFFFF"/>
+          <rect x="17" y="31" width="3" height="3" fill="#FFFFFF"/>
+          <rect x="11" y="34" width="4" height="2" fill="#1C1B1F"/>
+          <rect x="17" y="34" width="4" height="2" fill="#1C1B1F"/>
+          <rect x="12" y="20" width="8" height="2" fill="#E8AA7A"/>
+          <rect x="11" y="16" width="10" height="4" fill="#F472B6"/> 
+          <rect x="11" y="21" width="10" height="3" fill="#EF4444"/>
+          <rect x="10" y="23" width="12" height="2" fill="#DC2626"/>
+          <rect x="10" y="18" width="2" height="5" fill="#E8AA7A"/>
+          <rect x="20" y="18" width="2" height="5" fill="#E8AA7A"/>
+          <rect x="10" y="8" width="12" height="9" fill="#E8AA7A"/>
+          <rect x="12" y="11" width="2" height="2" fill="#1C1B1F"/>
+          <rect x="18" y="11" width="2" height="2" fill="#1C1B1F"/>
+          <rect x="13" y="11" width="1" height="1" fill="#FFFFFF"/>
+          <rect x="19" y="11" width="1" height="1" fill="#FFFFFF"/>
+          <rect x="15" y="13" width="1" height="1" fill="#D89A6A"/>
+          <rect x="11" y="13" width="2" height="1" fill="#F87171"/>
+          <rect x="19" y="13" width="2" height="1" fill="#F87171"/>
+          <path d="M9 6H23V10H21V8H11V10H9V6Z" fill="#3D231A"/>
+          <rect x="9" y="8" width="3" height="8" fill="#3D231A"/>
+          <rect x="20" y="8" width="3" height="8" fill="#3D231A"/>
+        </svg>
+      </div>
+      <div class="win-popup-title">PAPAPAPAPPAPAPAPA CHHAL M9OWDA LHBIBA DIALI ANA 👑</div>
+      <div class="win-popup-subtext">u always fuck distance in the face, i looove you ❤️</div>
+      <button class="std-btn" onclick="proceedToBirthdayCard()">Open Your Birthday Surprise 🎉</button>
+    </div>
+  </div>
+
+  <!-- STAGE 1: HARD MAZE MINI GAME -->
+  <div id="mazeStage">
+    <div class="maze-title">Find the Birthday Party! 🎂</div>
+    <div class="maze-instructions" id="mazeInstructions">
+      Benti, yalah nmchiw lgateau bach n7taflou, werki 3la dok dowarat lgris, bach t7eli les portes oranges, good luck, kamout elik
+    </div>
+    <div id="mazeBoard"></div>
+
+    <div class="dpad-container">
+      <button class="dpad-btn btn-up" onclick="movePlayer(0, -1)">▲</button>
+      <button class="dpad-btn btn-left" onclick="movePlayer(-1, 0)">◄</button>
+      <button class="dpad-btn btn-right" onclick="movePlayer(1, 0)">►</button>
+      <button class="dpad-btn btn-down" onclick="movePlayer(0, 1)">▼</button>
+    </div>
+  </div>
+
+  <!-- STAGE 2: MAIN BIRTHDAY CARD -->
+  <div id="cardStage">
+    <div id="cursorAvatar" class="idle facing-right">
+      <div class="avatar-inner">
+        <!-- FRONT-FACING SVG -->
+        <svg class="avatar-svg avatar-front" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
+          <rect x="9" y="6" width="14" height="14" fill="#3D231A"/>
+          <g class="girl-legs-front">
+            <rect x="12" y="24" width="3" height="7" fill="#E8AA7A"/>
+            <rect x="17" y="24" width="3" height="7" fill="#E8AA7A"/>
+            <rect x="12" y="31" width="3" height="3" fill="#FFFFFF"/>
+            <rect x="17" y="31" width="3" height="3" fill="#FFFFFF"/>
+            <rect x="11" y="34" width="4" height="2" fill="#1C1B1F"/>
+            <rect x="17" y="34" width="4" height="2" fill="#1C1B1F"/>
+          </g>
+          <g class="girl-body-front">
+            <rect x="12" y="20" width="8" height="2" fill="#E8AA7A"/>
+            <rect x="11" y="16" width="10" height="4" fill="#F472B6"/> 
+            <rect x="11" y="17" width="2" height="3" fill="#EC4899"/>
+            <rect x="19" y="17" width="2" height="3" fill="#EC4899"/>
+            <rect x="11" y="21" width="10" height="3" fill="#EF4444"/>
+            <rect x="10" y="23" width="12" height="2" fill="#DC2626"/>
+            
+            <g class="girl-arms-front">
+              <rect x="10" y="18" width="2" height="5" fill="#E8AA7A"/>
+              <rect x="20" y="18" width="2" height="5" fill="#E8AA7A"/>
+              <rect x="13" y="21" width="6" height="2" fill="#E8AA7A"/>
+            </g>
+
+            <g class="girl-head-front">
+              <rect x="10" y="8" width="12" height="9" fill="#E8AA7A"/>
+              <rect x="12" y="11" width="2" height="2" fill="#1C1B1F"/>
+              <rect x="18" y="11" width="2" height="2" fill="#1C1B1F"/>
+              <rect x="13" y="11" width="1" height="1" fill="#FFFFFF"/>
+              <rect x="19" y="11" width="1" height="1" fill="#FFFFFF"/>
+              <rect x="15" y="13" width="1" height="1" fill="#D89A6A"/>
+              <rect class="girl-blush" x="11" y="13" width="2" height="1" fill="#F87171"/>
+              <rect class="girl-blush" x="19" y="13" width="2" height="1" fill="#F87171"/>
+              <rect x="15" y="15" width="2" height="1" fill="#1C1B1F"/>
+
+              <g class="girl-hair-front">
+                <path d="M9 6H23V10H21V8H11V10H9V6Z" fill="#3D231A"/>
+                <rect x="9" y="8" width="3" height="8" fill="#3D231A"/>
+                <rect x="20" y="8" width="3" height="8" fill="#3D231A"/>
+              </g>
+            </g>
+          </g>
+        </svg>
+
+        <!-- SIDE-PROFILE WALKING SVG -->
+        <svg class="avatar-svg avatar-side" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
+          <path d="M10 6H20V20H10V6Z" fill="#3D231A"/>
+          <path d="M8 10H14V22H8V10Z" fill="#3D231A"/>
+          <g class="side-leg-back">
+            <rect x="13" y="24" width="3" height="7" fill="#D89A6A"/>
+            <rect x="13" y="31" width="3" height="3" fill="#FFFFFF"/>
+            <rect x="13" y="34" width="4" height="2" fill="#1C1B1F"/>
+          </g>
+          <g class="side-leg-front">
+            <rect x="17" y="24" width="3" height="7" fill="#E8AA7A"/>
+            <rect x="17" y="31" width="3" height="3" fill="#FFFFFF"/>
+            <rect x="17" y="34" width="4" height="2" fill="#1C1B1F"/>
+          </g>
+          <g class="side-body-group">
+            <rect x="12" y="20" width="4" height="2" fill="#E8AA7A"/>
+            <rect x="12" y="16" width="6" height="4" fill="#F472B6"/> 
+            <rect x="18" y="17" width="2" height="2" fill="#F472B6"/>
+            <rect x="11" y="17" width="2" height="3" fill="#EC4899"/>
+            <rect x="11" y="21" width="9" height="3" fill="#EF4444"/>
+            <rect x="10" y="23" width="11" height="2" fill="#DC2626"/>
+            <g class="side-arm"><rect x="14" y="18" width="2" height="5" fill="#E8AA7A"/></g>
+            <g class="side-head">
+              <rect x="11" y="8" width="9" height="8" fill="#E8AA7A"/>
+              <rect x="20" y="12" width="1" height="2" fill="#E8AA7A"/>
+              <rect x="17" y="11" width="2" height="3" fill="#1C1B1F"/>
+              <rect x="18" y="11" width="1" height="1" fill="#FFFFFF"/>
+              <rect x="16" y="13" width="2" height="1" fill="#F87171" opacity="0.8"/>
+              <rect x="19" y="13" width="1" height="1" fill="#1C1B1F"/>
+              <path d="M10 4H20V7H10V4Z" fill="#3D231A"/>
+              <rect x="18" y="7" width="2" height="2" fill="#3D231A"/>
+              <rect x="9" y="7" width="4" height="11" fill="#3D231A"/>
+            </g>
+          </g>
+        </svg>
+
+        <!-- KNEELING SIDE SVG -->
+        <svg class="avatar-svg avatar-kneel" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
+          <path d="M10 12H20V26H10V12Z" fill="#3D231A"/>
+          <g class="kneel-legs">
+            <rect x="13" y="26" width="6" height="4" fill="#D89A6A"/>
+            <rect x="10" y="30" width="8" height="3" fill="#E8AA7A"/>
+            <rect x="8" y="30" width="4" height="3" fill="#FFFFFF"/>
+            <rect x="6" y="30" width="3" height="3" fill="#1C1B1F"/>
+          </g>
+          <g class="kneel-body-group">
+            <rect x="12" y="22" width="4" height="2" fill="#E8AA7A"/>
+            <rect x="12" y="18" width="6" height="4" fill="#F472B6"/> 
+            <rect x="18" y="19" width="2" height="2" fill="#F472B6"/>
+            <rect x="10" y="23" width="11" height="4" fill="#EF4444"/>
+            <g class="kneel-arm"><rect x="15" y="20" width="5" height="2" fill="#E8AA7A"/></g>
+            <g class="kneel-head">
+              <rect x="11" y="10" width="9" height="8" fill="#E8AA7A"/>
+              <rect x="20" y="13" width="1" height="2" fill="#E8AA7A"/>
+              <rect x="17" y="13" width="2" height="3" fill="#1C1B1F"/>
+              <rect x="18" y="13" width="1" height="1" fill="#FFFFFF"/>
+              <rect x="16" y="15" width="2" height="1" fill="#F87171" opacity="0.8"/>
+              <path d="M10 6H20V9H10V6Z" fill="#3D231A"/>
+              <rect x="18" y="9" width="2" height="2" fill="#3D231A"/>
+              <rect x="9" y="9" width="4" height="11" fill="#3D231A"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- LOADING OVERLAY SCREEN 1 -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="walking-track">
+        <div class="avatar-wrapper">
+          <svg viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
+            <path d="M10 6H20V20H10V6Z" fill="#3D231A"/>
+            <path d="M8 10H14V22H8V10Z" fill="#3D231A"/>
+            <g class="loader-leg-back">
+              <rect x="13" y="24" width="3" height="7" fill="#D89A6A"/>
+              <rect x="13" y="31" width="3" height="3" fill="#FFFFFF"/>
+              <rect x="13" y="34" width="4" height="2" fill="#1C1B1F"/>
+            </g>
+            <g class="loader-leg-front">
+              <rect x="17" y="24" width="3" height="7" fill="#E8AA7A"/>
+              <rect x="17" y="31" width="3" height="3" fill="#FFFFFF"/>
+              <rect x="17" y="34" width="4" height="2" fill="#1C1B1F"/>
+            </g>
+            <g class="loader-walking-body">
+              <rect x="12" y="20" width="4" height="2" fill="#E8AA7A"/>
+              <rect x="12" y="16" width="6" height="4" fill="#F472B6"/> 
+              <rect x="18" y="17" width="2" height="2" fill="#F472B6"/>
+              <rect x="11" y="17" width="2" height="3" fill="#EC4899"/>
+              <rect x="11" y="21" width="9" height="3" fill="#EF4444"/>
+              <rect x="10" y="23" width="11" height="2" fill="#DC2626"/>
+              
+              <g class="held-gift">
+                <rect x="18" y="15" width="7" height="7" fill="#F43F5E"/>
+                <rect x="21" y="15" width="1" height="7" fill="#FDE047"/>
+                <rect x="18" y="18" width="7" height="1" fill="#FDE047"/>
+              </g>
+
+              <g class="side-arm"><rect x="16" y="18" width="4" height="2" fill="#E8AA7A"/></g>
+
+              <g class="side-head">
+                <rect x="11" y="8" width="9" height="8" fill="#E8AA7A"/>
+                <rect x="20" y="12" width="1" height="2" fill="#E8AA7A"/>
+                <rect x="17" y="11" width="2" height="3" fill="#1C1B1F"/>
+                <rect x="18" y="11" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="16" y="13" width="2" height="1" fill="#F87171" opacity="0.8"/>
+                <rect x="19" y="13" width="1" height="1" fill="#1C1B1F"/>
+                <path d="M10 4H20V7H10V4Z" fill="#3D231A"/>
+                <rect x="18" y="7" width="2" height="2" fill="#3D231A"/>
+                <rect x="9" y="7" width="4" height="11" fill="#3D231A"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="loading-text">Witk witk witk ela hbiba w lmechia ki cute</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- LOADING OVERLAY SCREEN 2 (BLACK DRESS & HIGH HEELS) -->
+    <div class="loading-overlay" id="loadingOverlay2">
+      <div class="walking-track">
+        <div class="avatar-wrapper">
+          <svg viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
+            <path d="M10 6H20V22H10V6Z" fill="#1C1B1F"/>
+            <path d="M8 10H14V24H8V10Z" fill="#1C1B1F"/>
+            
+            <g class="loader-leg-back">
+              <rect x="13" y="22" width="2" height="9" fill="#D89A6A"/>
+              <rect x="13" y="31" width="2" height="3" fill="#000000"/>
+              <rect x="12" y="33" width="4" height="1" fill="#000000"/>
+              <rect x="12" y="34" width="1" height="2" fill="#000000"/>
+            </g>
+            <g class="loader-leg-front">
+              <rect x="17" y="22" width="2" height="9" fill="#E8AA7A"/>
+              <rect x="17" y="31" width="2" height="3" fill="#000000"/>
+              <rect x="16" y="33" width="4" height="1" fill="#000000"/>
+              <rect x="16" y="34" width="1" height="2" fill="#000000"/>
+            </g>
+
+            <g class="loader-walking-body">
+              <rect x="12" y="19" width="4" height="2" fill="#E8AA7A"/>
+              
+              <rect x="11" y="15" width="8" height="5" fill="#121212"/> 
+              <rect x="11" y="15" width="2" height="2" fill="#E8AA7A"/>
+              <rect x="10" y="20" width="10" height="3" fill="#181818"/>
+              <rect x="10" y="23" width="8" height="2" fill="#121212"/>
+              
+              <g class="held-gift">
+                <rect x="18" y="14" width="7" height="7" fill="#F43F5E"/>
+                <rect x="21" y="14" width="1" height="7" fill="#FDE047"/>
+                <rect x="18" y="17" width="7" height="1" fill="#FDE047"/>
+              </g>
+
+              <g class="side-arm"><rect x="15" y="17" width="4" height="2" fill="#E8AA7A"/></g>
+
+              <g class="side-head">
+                <rect x="11" y="8" width="9" height="8" fill="#E8AA7A"/>
+                <rect x="20" y="12" width="1" height="2" fill="#E8AA7A"/>
+                <rect x="17" y="11" width="2" height="3" fill="#1C1B1F"/>
+                <rect x="18" y="11" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="16" y="13" width="2" height="1" fill="#F87171" opacity="0.9"/>
+                <rect x="19" y="13" width="1" height="1" fill="#1C1B1F"/>
+                <path d="M10 4H20V7H10V4Z" fill="#1C1B1F"/>
+                <rect x="18" y="7" width="2" height="2" fill="#1C1B1F"/>
+                <rect x="9" y="7" width="4" height="12" fill="#1C1B1F"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="loading-text">wa laaaaalla ela hbiba kijaha dress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressFill2"></div>
+      </div>
+    </div>
+
+    <div class="container" id="mainCard">
+      <div class="phase-indicator">
+        <span class="step-badge active" id="badge1">01. Unbox Gift</span>
+        <span class="step-badge" id="badge2">02. Memory Vault</span>
+        <span class="step-badge" id="badge3">03. Grand Finale</span>
+      </div>
+
+      <!-- PAGE 1 -->
+      <div class="phase-content active" id="p1-intro">
+        <div class="p1-title">Benti hbibti</div>
+        <div class="p1-subtitle">This is a small gift for you, i hope u like it</div>
+
+        <div class="gift-btn-container" id="giftContainer">
+          <canvas id="particleCanvas"></canvas>
+
+          <div class="decomp-overlay" id="decompOverlay">
+            <div class="decomp-piece"></div>
+            <div class="decomp-piece"></div>
+            <div class="decomp-piece ribbon-v"></div>
+            <div class="decomp-piece"></div>
+            <div class="decomp-piece"></div>
+            <div class="decomp-piece"></div>
+            <div class="decomp-piece"></div>
+            <div class="decomp-piece ribbon-v"></div>
+            <div class="decomp-piece"></div>
+            <div class="decomp-piece"></div>
+          </div>
+
+          <button class="gift-btn" id="unboxBtn" onclick="fastTransition('p1-q1', event)">
+            🎁 Unbox the gift
+          </button>
+        </div>
+      </div>
+
+      <!-- QUESTION 1 -->
+      <div class="phase-content" id="p1-q1">
+        <div class="progress-bar-text">Question 1 of 4</div>
+        <h2>Memory #1</h2>
+        <div class="input-group">
+          <label for="ans1">In what city did we first met?</label>
+          <input type="text" id="ans1" placeholder="Type your answer..." autocomplete="off">
+          <div class="error-msg" id="err1">Try again hbiba! 😉</div>
+        </div>
+        <button class="std-btn" onclick="checkQuestion(1, ['casa', 'casablanca', 'dar baida', 'bf\'s city', '9lbk'], 'p1-q2', event)">Next Memory →</button>
+      </div>
+
+      <!-- QUESTION 2 -->
+      <div class="phase-content" id="p1-q2">
+        <div class="progress-bar-text">Question 2 of 4</div>
+        <h2>Memory #2</h2>
+        <div class="input-group">
+          <label for="ans2">There are plenty of words that only you say, which one is your boyfriend's favorite?</label>
+          <input type="text" id="ans2" placeholder="Type your answer..." autocomplete="off">
+          <div class="error-msg" id="err2">Try again! You know this word... 🤔</div>
+        </div>
+        <button class="std-btn" onclick="checkQuestion(2, ['ash', 'daghi', 'o', 'kochi', 'makich', 'kahma9 elik'], 'p1-q3', event)">Next Memory →</button>
+      </div>
+
+      <!-- QUESTION 3 -->
+      <div class="phase-content" id="p1-q3">
+        <div class="progress-bar-text">Question 3 of 4</div>
+        <h2>Memory #3</h2>
+        <div class="input-group">
+          <label>Do you really think that your boyfriend deserves you?</label>
+          <div class="q3-choice-container" id="q3Box">
+            <button class="std-btn btn-yes" onclick="fastTransition('p1-q4', event)">Yes ❤️</button>
+            <button class="std-btn btn-no" id="noBtn" onmouseenter="dodgeNoButton()" onclick="dodgeNoButton()">No 😜</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION 4 -->
+      <div class="phase-content" id="p1-q4">
+        <div class="progress-bar-text">Question 4 of 4</div>
+        <h2>Memory #4</h2>
+        <div class="input-group">
+          <label for="ans4">Thank god you said yes, now i want you to type in what's the most wanted gift you ever wish for (a part dheb a hbiba stp)</label>
+          <input type="text" id="ans4" placeholder="Type anything you want..." autocomplete="off">
+        </div>
+        <button class="std-btn" onclick="triggerPage2Loading('phase2', event)">Unlock Memory Vault →</button>
+      </div>
+
+      <!-- PHASE 2 -->
+      <div class="phase-content" id="phase2">
+        <h1>Phase 2: Our Memory Vault 📸</h1>
+        <p>Access granted! Here is a curated timeline of our 2 years together, complete with voice notes and photos.</p>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">Chapter I • First Met</div>
+            <div class="timeline-title">Where It All Began</div>
+            <p>The moment we met and realized we could talk for hours without getting bored.</p>
+            <audio controls>
+              <source src="audio/voice_note_1.mp3" type="audio/mpeg">
+            </audio>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-date">Chapter II • 2 Years of Memories</div>
+            <div class="timeline-title">Late Night Talks & Motorcycle Rides</div>
+            <p>Listen to this short audio message recorded specifically for this moment:</p>
+            <audio controls>
+              <source src="audio/voice_note_2.mp3" type="audio/mpeg">
+            </audio>
+          </div>
+        </div>
+
+        <!-- PHOTO GALLERY GRID -->
+        <div class="gallery-title">🖼️ Our Favorite Moments</div>
+        <div class="photo-grid">
+          <div class="photo-card" onclick="openLightbox('images/photo1.jpg')">
+            <img src="images/photo1.jpg" alt="Memory 1" onerror="this.src='https://via.placeholder.com/300/161b22/f43f5e?text=Photo+1'">
+          </div>
+          <div class="photo-card" onclick="openLightbox('images/photo2.jpg')">
+            <img src="images/photo2.jpg" alt="Memory 2" onerror="this.src='https://via.placeholder.com/300/161b22/f43f5e?text=Photo+2'">
+          </div>
+          <div class="photo-card" onclick="openLightbox('images/photo3.jpg')">
+            <img src="images/photo3.jpg" alt="Memory 3" onerror="this.src='https://via.placeholder.com/300/161b22/f43f5e?text=Photo+3'">
+          </div>
+          <div class="photo-card" onclick="openLightbox('images/photo4.jpg')">
+            <img src="images/photo4.jpg" alt="Memory 4" onerror="this.src='https://via.placeholder.com/300/161b22/f43f5e?text=Photo+4'">
+          </div>
+        </div>
+
+        <button class="std-btn" onclick="triggerNext('phase3', event)">Proceed to Your Grand Finale →</button>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div class="phase-content" id="phase3">
+        <h1>Phase 3: Happy Birthday! 🎉</h1>
+        <p>Your custom digital feature and birthday letter.</p>
+
+        <div class="letter-box">
+          <p>Happy Birthday Benti!</p>
+          <br>
+          <p>I built this digital package so you would have something permanent, personal, and completely unique to hold onto. Every clue, memory, and audio note here belongs strictly to our 2 years of love and passion.</p>
+          <br>
+          <p>Thank you for being my favorite person and best friend. Here's to growing old together!</p>
+          <div class="signature">With all my love,<br>Amine</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* PUZZLE MAZE LOGIC */
+    let mazeMap = [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2, 1], 
+      [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1],
+      [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], 
+      [1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1], 
+      [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+      [1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+      [1, 3, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1], 
+      [1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1], 
+      [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 5, 1, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 5, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 5, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 5, 0, 1, 0, 1],
+      [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1], 
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ];
+
+    let playerPos = { x: 1, y: 1 };
+    const goalPos = { x: 15, y: 15 };
+    
+    let moveCount = 0;
+    let chaserActive = false;
+    let chaserRemovedPermanently = false;
+    let chaserPos = { x: 1, y: 1 };
+    let chaserInterval = null;
+
+    const girlSvgIcon = `
+      <svg class="maze-avatar-icon" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="9" y="6" width="14" height="14" fill="#3D231A"/>
+        <rect x="12" y="24" width="3" height="7" fill="#E8AA7A"/>
+        <rect x="17" y="24" width="3" height="7" fill="#E8AA7A"/>
+        <rect x="12" y="31" width="3" height="3" fill="#FFFFFF"/>
+        <rect x="17" y="31" width="3" height="3" fill="#FFFFFF"/>
+        <rect x="11" y="34" width="4" height="2" fill="#1C1B1F"/>
+        <rect x="17" y="34" width="4" height="2" fill="#1C1B1F"/>
+        <rect x="12" y="20" width="8" height="2" fill="#E8AA7A"/>
+        <rect x="11" y="16" width="10" height="4" fill="#F472B6"/> 
+        <rect x="11" y="21" width="10" height="3" fill="#EF4444"/>
+        <rect x="10" y="23" width="12" height="2" fill="#DC2626"/>
+        <rect x="10" y="18" width="2" height="5" fill="#E8AA7A"/>
+        <rect x="20" y="18" width="2" height="5" fill="#E8AA7A"/>
+        <rect x="10" y="8" width="12" height="9" fill="#E8AA7A"/>
+        <rect x="12" y="11" width="2" height="2" fill="#1C1B1F"/>
+        <rect x="18" y="11" width="2" height="2" fill="#1C1B1F"/>
+        <rect x="13" y="11" width="1" height="1" fill="#FFFFFF"/>
+        <rect x="19" y="11" width="1" height="1" fill="#FFFFFF"/>
+        <rect x="15" y="13" width="1" height="1" fill="#D89A6A"/>
+        <rect x="11" y="13" width="2" height="1" fill="#F87171"/>
+        <rect x="19" y="13" width="2" height="1" fill="#F87171"/>
+        <path d="M9 6H23V10H21V8H11V10H9V6Z" fill="#3D231A"/>
+        <rect x="9" y="8" width="3" height="8" fill="#3D231A"/>
+        <rect x="20" y="8" width="3" height="8" fill="#3D231A"/>
+      </svg>
+    `;
+
+    function renderMaze() {
+      const board = document.getElementById('mazeBoard');
+      if (!board) return;
+      board.innerHTML = '';
+
+      for (let r = 0; r < mazeMap.length; r++) {
+        for (let c = 0; c < mazeMap[r].length; c++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          
+          const tile = mazeMap[r][c];
+
+          if (tile === 1 || tile === 4 || tile === 5) {
+            cell.classList.add('wall');
+            if (tile === 4 || tile === 5) {
+              cell.classList.add('blocker-wall');
+              cell.innerText = '🧱';
+            }
+          } else if (tile === 2 || tile === 3) {
+            cell.classList.add('path');
+            cell.innerText = '🔘';
+          } else {
+            cell.classList.add('path');
+            if (r === 1 && c === 1) cell.classList.add('start');
+            if (r === goalPos.y && c === goalPos.x) {
+              cell.classList.add('goal');
+              cell.innerText = '🎂';
+            }
+          }
+
+          if (playerPos.x === c && playerPos.y === r) {
+            cell.innerHTML = girlSvgIcon;
+          }
+
+          if (chaserActive && !chaserRemovedPermanently && chaserPos.x === c && chaserPos.y === r) {
+            cell.innerText = '👾';
+          }
+
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function movePlayer(dx, dy) {
+      const newX = playerPos.x + dx;
+      const newY = playerPos.y + dy;
+
+      if (mazeMap[newY] && (mazeMap[newY][newX] === 0 || mazeMap[newY][newX] === 2 || mazeMap[newY][newX] === 3)) {
+        playerPos.x = newX;
+        playerPos.y = newY;
+        moveCount++;
+
+        if (mazeMap[newY][newX] === 2) {
+          for (let col = 0; col < 17; col++) {
+            if (mazeMap[4][col] === 4) mazeMap[4][col] = 0;
+          }
+          mazeMap[newY][newX] = 0;
+        } 
+        else if (mazeMap[newY][newX] === 3) {
+          for (let row = 0; row < 17; row++) {
+            if (mazeMap[row][12] === 5) mazeMap[row][12] = 0;
+          }
+          mazeMap[newY][newX] = 0;
+        }
+
+        if (moveCount === 6 && !chaserActive && !chaserRemovedPermanently) {
+          chaserActive = true;
+          chaserPos = { x: 1, y: 1 };
+          
+          const instructionsEl = document.getElementById('mazeInstructions');
+          if (instructionsEl) {
+            instructionsEl.innerText = "DAGHI DAGHI HBIBA, DISTANCE TAB3ANA";
+            instructionsEl.classList.add('chaser-alert');
+          }
+
+          startChaserAI();
+        }
+
+        renderMaze();
+
+        if (playerPos.x === goalPos.x && playerPos.y === goalPos.y) {
+          clearInterval(chaserInterval);
+          triggerExplosion(window.innerWidth / 2, window.innerHeight / 2);
+          const winModal = document.getElementById('winPopup');
+          if (winModal) winModal.classList.add('active');
+        }
+
+        if (chaserActive && !chaserRemovedPermanently && playerPos.x === chaserPos.x && playerPos.y === chaserPos.y) {
+          handleCaughtByChaser();
+        }
+      }
+    }
+
+    function proceedToBirthdayCard() {
+      const winModal = document.getElementById('winPopup');
+      if (winModal) winModal.classList.remove('active');
+      const stage = document.getElementById('mazeStage');
+      if (stage) stage.classList.add('hidden');
+      setTimeout(() => {
+        if (stage) stage.style.display = 'none';
+        const cardStage = document.getElementById('cardStage');
+        if (cardStage) cardStage.classList.add('active');
+        document.body.classList.add('in-card');
+      }, 600);
+    }
+
+    function startChaserAI() {
+      chaserInterval = setInterval(() => {
+        if (!chaserActive || chaserRemovedPermanently) return;
+        
+        let path = findBFSPath(chaserPos, playerPos);
+        if (path && path.length > 1) {
+          chaserPos = path[1];
+          renderMaze();
+
+          if (playerPos.x === chaserPos.x && playerPos.y === chaserPos.y) {
+            handleCaughtByChaser();
+          }
+        }
+      }, 650);
+    }
+
+    function handleCaughtByChaser() {
+      clearInterval(chaserInterval);
+      chaserActive = false;
+      chaserRemovedPermanently = true;
+
+      alert("hania hbiba hania aaaaaslan nti m9owda w kamout elik, ana an7eydha lik a cutie kima an7eydha in real life");
+
+      const instructionsEl = document.getElementById('mazeInstructions');
+      if (instructionsEl) {
+        instructionsEl.innerText = "Benti, yalah nmchiw lgateau bach n7taflou, werki 3la dok dowarat lgris, bach t7eli les portes oranges, good luck, kamout elik";
+        instructionsEl.classList.remove('chaser-alert');
+      }
+
+      renderMaze();
+    }
+
+    function findBFSPath(start, target) {
+      let queue = [[start]];
+      let visited = new Set();
+      visited.add(`${start.x},${start.y}`);
+
+      while (queue.length > 0) {
+        let path = queue.shift();
+        let curr = path[path.length - 1];
+
+        if (curr.x === target.x && curr.y === target.y) return path;
+
+        const neighbors = [
+          { x: curr.x + 1, y: curr.y },
+          { x: curr.x - 1, y: curr.y },
+          { x: curr.x, y: curr.y + 1 },
+          { x: curr.x, y: curr.y - 1 }
+        ];
+
+        for (let n of neighbors) {
+          if (
+            mazeMap[n.y] && 
+            (mazeMap[n.y][n.x] === 0 || mazeMap[n.y][n.x] === 2 || mazeMap[n.y][n.x] === 3) &&
+            !visited.has(`${n.x},${n.y}`)
+          ) {
+            visited.add(`${n.x},${n.y}`);
+            queue.push([...path, n]);
+          }
+        }
+      }
+      return null;
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const mazeStageEl = document.getElementById('mazeStage');
+      if (mazeStageEl && mazeStageEl.classList.contains('hidden')) return;
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') movePlayer(0, -1);
+      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') movePlayer(0, 1);
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') movePlayer(-1, 0);
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') movePlayer(1, 0);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMaze();
+    });
+
+    /* MAIN CARD LOGIC & HEART PARTICLES */
+    const cursorAvatar = document.getElementById('cursorAvatar');
+    const giftContainer = document.getElementById('giftContainer');
+    const unboxBtn = document.getElementById('unboxBtn');
+    const decompOverlay = document.getElementById('decompOverlay');
+    const pieces = document.querySelectorAll('.decomp-piece');
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    const mainCard = document.getElementById('mainCard');
+
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas ? bgCanvas.getContext('2d') : null;
+    let bgParticles = [];
+
+    const fxCanvas = document.getElementById('fxCanvas');
+    const fxCtx = fxCanvas ? fxCanvas.getContext('2d') : null;
+    let fxParticles = [];
+
+    function resizeCanvases() {
+      if (bgCanvas && fxCanvas) {
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+        fxCanvas.width = window.innerWidth;
+        fxCanvas.height = window.innerHeight;
+      }
+    }
+    window.addEventListener('resize', resizeCanvases);
+    resizeCanvases();
+
+    class BgParticle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * (bgCanvas ? bgCanvas.width : window.innerWidth);
+        this.y = -20;
+        this.size = Math.random() * 6 + 3;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = Math.random() * 1.5 + 0.8;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.08;
+        this.type = Math.random() > 0.4 ? 'confetti' : 'sparkle';
+        this.colors = ['#f43f5e', '#fde047', '#38bdf8', '#a855f7', '#4ade80', '#fb7185'];
+        this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+        this.alpha = Math.random() * 0.7 + 0.3;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy; this.rotation += this.rotSpeed;
+        if (bgCanvas && this.y > bgCanvas.height + 20) this.reset();
+      }
+      draw() {
+        if (!bgCtx) return;
+        bgCtx.save();
+        bgCtx.translate(this.x, this.y);
+        bgCtx.rotate(this.rotation);
+        bgCtx.globalAlpha = this.alpha;
+        bgCtx.fillStyle = this.color;
+        if (this.type === 'confetti') {
+          bgCtx.fillRect(-this.size / 2, -this.size / 4, this.size, this.size / 2);
+        } else {
+          bgCtx.beginPath(); bgCtx.arc(0, 0, this.size / 2, 0, Math.PI * 2); bgCtx.fill();
+        }
+        bgCtx.restore();
+      }
+    }
+
+    function initBgParticles() {
+      bgParticles = [];
+      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 12000);
+      for (let i = 0; i < particleCount; i++) {
+        const p = new BgParticle(); p.y = Math.random() * window.innerHeight; bgParticles.push(p);
+      }
+    }
+    initBgParticles();
+
+    function renderBgParticles() {
+      if (bgCtx && bgCanvas) {
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        bgParticles.forEach(p => { p.update(); p.draw(); });
+      }
+      requestAnimationFrame(renderBgParticles);
+    }
+    renderBgParticles();
+
+    class HeartFxParticle {
+      constructor(x, y) {
+        this.x = x; this.y = y;
+        this.size = Math.random() * 12 + 8;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 10 + 3;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.colors = ['#f43f5e', '#fb7185', '#fda4af', '#e11d48', '#ffffff'];
+        this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+        this.alpha = 1;
+        this.decay = Math.random() * 0.02 + 0.012;
+        this.gravity = 0.15;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.1;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy; this.vy += this.gravity;
+        this.vx *= 0.96; this.vy *= 0.96; this.alpha -= this.decay;
+        this.rotation += this.rotSpeed;
+      }
+      draw() {
+        if (!fxCtx) return;
+        fxCtx.save();
+        fxCtx.translate(this.x, this.y);
+        fxCtx.rotate(this.rotation);
+        fxCtx.globalAlpha = Math.max(0, this.alpha);
+        fxCtx.fillStyle = this.color;
+        
+        const s = this.size;
+        fxCtx.beginPath();
+        fxCtx.moveTo(0, 0);
+        fxCtx.bezierCurveTo(-s / 2, -s / 2, -s, s / 3, 0, s);
+        fxCtx.bezierCurveTo(s, s / 3, s / 2, -s / 2, 0, 0);
+        fxCtx.fill();
+        fxCtx.restore();
+      }
+    }
+
+    function triggerExplosion(x, y) {
+      for (let i = 0; i < 50; i++) fxParticles.push(new HeartFxParticle(x, y));
+    }
+
+    function renderFxParticles() {
+      if (fxCtx && fxCanvas) {
+        fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+        fxParticles.forEach((p, index) => {
+          p.update(); p.draw();
+          if (p.alpha <= 0) fxParticles.splice(index, 1);
+        });
+      }
+      requestAnimationFrame(renderFxParticles);
+    }
+    renderFxParticles();
+
+    let shiftIndex = 1;
+    function danceBox() {
+      if (!mainCard) return;
+      mainCard.classList.remove('box-shift-1', 'box-shift-2', 'box-shift-3', 'box-shift-4');
+      void mainCard.offsetWidth;
+      mainCard.classList.add(`box-shift-${shiftIndex}`);
+      shiftIndex = (shiftIndex % 4) + 1;
+    }
+
+    let lastX = 0;
+    let stopTimer = null;
+    let shyTimer = null;
+    let isDecomposing = false;
+    let isCelebrating = false;
+    let isDecomposedFinished = false;
+
+    function resizeCanvas() {
+      if (giftContainer && canvas) {
+        canvas.width = giftContainer.clientWidth;
+        canvas.height = giftContainer.clientHeight;
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function handlePointerMove(clientX, clientY) {
+      if (!document.body.classList.contains('in-card') || !cursorAvatar) return;
+
+      cursorAvatar.style.left = `${clientX}px`;
+      cursorAvatar.style.top = `${clientY - 25}px`;
+
+      if (clientX > lastX + 1) {
+        cursorAvatar.classList.remove('facing-left');
+        cursorAvatar.classList.add('facing-right');
+      } else if (clientX < lastX - 1) {
+        cursorAvatar.classList.remove('facing-right');
+        cursorAvatar.classList.add('facing-left');
+      }
+      lastX = clientX;
+
+      if (!isDecomposing && !isCelebrating) {
+        cursorAvatar.classList.remove('idle', 'shy', 'kneeling', 'jumping');
+        cursorAvatar.classList.add('walking');
+
+        clearTimeout(stopTimer);
+        clearTimeout(shyTimer);
+
+        stopTimer = setTimeout(() => {
+          cursorAvatar.classList.remove('walking');
+          cursorAvatar.classList.add('idle');
+
+          shyTimer = setTimeout(() => {
+            if (cursorAvatar.classList.contains('idle')) {
+              cursorAvatar.classList.add('shy');
+            }
+          }, 1200);
+
+        }, 120);
+      }
+    }
+
+    window.addEventListener('mousemove', (e) => handlePointerMove(e.clientX, e.clientY));
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    let particles = [];
+    class Particle {
+      constructor(x, y) {
+        this.x = x; this.y = y;
+        this.size = Math.random() * 5 + 3;
+        this.vx = (Math.random() - 0.5) * 6;
+        this.vy = (Math.random() - 0.7) * 7;
+        this.colors = ['#f43f5e', '#fde047', '#fda4af', '#38bdf8', '#a855f7'];
+        this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+        this.alpha = 1;
+        this.decay = Math.random() * 0.015 + 0.008;
+        this.gravity = 0.12;
+      }
+      update() { this.x += this.vx; this.y += this.vy; this.vy += this.gravity; this.alpha -= this.decay; }
+      draw() {
+        if (!ctx) return;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function spawnParticles() {
+      if (!canvas) return;
+      particles = [];
+      for (let i = 0; i < 35; i++) particles.push(new Particle(canvas.width / 2, canvas.height / 2));
+    }
+
+    function animateParticles() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, index) => {
+        p.update(); p.draw();
+        if (p.alpha <= 0) particles.splice(index, 1);
+      });
+      if (particles.length > 0) requestAnimationFrame(animateParticles);
+    }
+
+    if (decompOverlay) {
+      const triggerPieceShake = () => {
+        if (!giftContainer) return;
+        giftContainer.classList.remove('piece-shake');
+        void giftContainer.offsetWidth;
+        giftContainer.classList.add('piece-shake');
+      };
+
+      const startDecomposition = () => {
+        if (isDecomposing || isDecomposedFinished) return;
+
+        isDecomposing = true;
+        clearTimeout(stopTimer);
+        clearTimeout(shyTimer);
+
+        if (cursorAvatar) {
+          cursorAvatar.classList.remove('walking', 'idle', 'shy', 'jumping');
+          cursorAvatar.classList.add('kneeling');
+        }
+
+        pieces.forEach((piece, index) => {
+          setTimeout(() => {
+            piece.classList.add('shredded');
+            triggerPieceShake();
+          }, index * 600);
+        });
+
+        setTimeout(() => {
+          isDecomposing = false;
+          decompOverlay.style.display = 'none';
+
+          if (unboxBtn) {
+            unboxBtn.classList.add('shaking');
+            setTimeout(() => unboxBtn.classList.remove('shaking'), 400);
+          }
+
+          spawnParticles(); animateParticles();
+
+          isCelebrating = true;
+          if (cursorAvatar) {
+            cursorAvatar.classList.remove('kneeling');
+            cursorAvatar.classList.add('jumping');
+          }
+
+          setTimeout(() => {
+            isCelebrating = false;
+            isDecomposedFinished = true;
+            if (cursorAvatar) {
+              cursorAvatar.classList.remove('jumping');
+              cursorAvatar.classList.add('idle');
+            }
+            if (unboxBtn) unboxBtn.classList.add('unlocked');
+          }, 3500);
+
+        }, pieces.length * 600);
+      };
+
+      decompOverlay.addEventListener('mouseenter', startDecomposition);
+      decompOverlay.addEventListener('touchstart', startDecomposition, { passive: true });
+    }
+
+    function fastTransition(targetId, evt) {
+      danceBox();
+      const clickX = evt ? (evt.clientX || window.innerWidth / 2) : window.innerWidth / 2;
+      const clickY = evt ? (evt.clientY || window.innerHeight / 2) : window.innerHeight / 2;
+      triggerExplosion(clickX, clickY);
+
+      if (cursorAvatar) {
+        cursorAvatar.classList.remove('walking', 'idle', 'shy', 'kneeling');
+        cursorAvatar.classList.add('jumping');
+        setTimeout(() => {
+          cursorAvatar.classList.remove('jumping');
+          cursorAvatar.classList.add('idle');
+        }, 800);
+      }
+
+      showStep(targetId);
+    }
+
+    function triggerPage2Loading(targetId, evt) {
+      danceBox();
+      if (evt) triggerExplosion(evt.clientX || window.innerWidth / 2, evt.clientY || window.innerHeight / 2);
+
+      const loader = document.getElementById('loadingOverlay2');
+      const progressFill = document.getElementById('progressFill2');
+      
+      if (loader && progressFill) {
+        progressFill.style.transition = 'none';
+        progressFill.style.width = '0%';
+        
+        document.body.classList.add('is-loading');
+        loader.classList.add('active');
+
+        setTimeout(() => {
+          progressFill.style.transition = 'width 5s linear';
+          progressFill.style.width = '100%';
+        }, 50);
+
+        setTimeout(() => {
+          showStep(targetId);
+          loader.classList.remove('active');
+          document.body.classList.remove('is-loading');
+        }, 5000);
+      } else {
+        showStep(targetId);
+      }
+    }
+
+    function triggerNext(targetId, evt) {
+      danceBox();
+      if (evt) triggerExplosion(evt.clientX || window.innerWidth / 2, evt.clientY || window.innerHeight / 2);
+
+      const loader = document.getElementById('loadingOverlay');
+      const progressFill = document.getElementById('progressFill');
+      
+      if (loader && progressFill) {
+        progressFill.style.transition = 'none';
+        progressFill.style.width = '0%';
+        
+        document.body.classList.add('is-loading');
+        loader.classList.add('active');
+
+        setTimeout(() => {
+          progressFill.style.transition = 'width 5s linear';
+          progressFill.style.width = '100%';
+        }, 50);
+
+        setTimeout(() => {
+          showStep(targetId);
+          loader.classList.remove('active');
+          document.body.classList.remove('is-loading');
+        }, 5000);
+      } else {
+        showStep(targetId);
+      }
+    }
+
+    function showStep(targetId) {
+      document.querySelectorAll('.phase-content').forEach(el => el.classList.remove('active'));
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) targetElement.classList.add('active');
+
+      const badge1 = document.getElementById('badge1');
+      const badge2 = document.getElementById('badge2');
+      const badge3 = document.getElementById('badge3');
+
+      if (badge1) badge1.classList.remove('active');
+      if (badge2) badge2.classList.remove('active');
+      if (badge3) badge3.classList.remove('active');
+
+      if (targetId.startsWith('p1')) {
+        if (badge1) badge1.classList.add('active');
+      } else if (targetId === 'phase2') {
+        if (badge2) badge2.classList.add('active');
+      } else if (targetId === 'phase3') {
+        if (badge3) badge3.classList.add('active');
+      }
+    }
+
+    function checkQuestion(qNum, validAnswers, nextStep, evt) {
+      const inputEl = document.getElementById('ans' + qNum);
+      const val = inputEl ? inputEl.value.trim().toLowerCase() : '';
+      const errEl = document.getElementById('err' + qNum);
+
+      if (validAnswers.includes(val) || val.length > 0) {
+        if (errEl) errEl.style.display = 'none';
+        fastTransition(nextStep, evt);
+      } else {
+        if (errEl) errEl.style.display = 'block';
+        danceBox();
+      }
+    }
+
+    function dodgeNoButton() {
+      const noBtn = document.getElementById('noBtn');
+      const container = document.getElementById('q3Box');
+      
+      if (!noBtn || !container) return;
+
+      const maxX = container.clientWidth - noBtn.clientWidth;
+      const maxY = 120;
+
+      const randomX = Math.floor(Math.random() * (maxX + 1));
+      const randomY = Math.floor((Math.random() - 0.5) * maxY);
+
+      noBtn.style.position = 'relative';
+      noBtn.style.left = `${randomX - (noBtn.clientWidth / 2)}px`;
+      noBtn.style.top = `${randomY}px`;
+    }
+
+    /* LIGHTBOX LOGIC */
+    function openLightbox(src) {
+      const img = document.getElementById('lightboxImg');
+      const modal = document.getElementById('lightboxModal');
+      if (img && modal) {
+        img.src = src;
+        modal.classList.add('active');
+      }
+    }
+
+    function closeLightbox() {
+      const modal = document.getElementById('lightboxModal');
+      if (modal) modal.classList.remove('active');
+    }
+  </script>
+</body>
+</html>
