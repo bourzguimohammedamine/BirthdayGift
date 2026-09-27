@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy Birthday! 🎁</title>
+  <title>Happy Birthday & Happy Anniversary! 🎁</title>
   <style>
     :root {
       --bg-color: #0d1117;
@@ -912,6 +912,11 @@
 </head>
 <body>
 
+  <!-- BACKGROUND AUDIO PLAYER FOR INTRO TRACK -->
+  <audio id="bgIntroAudio" loop preload="auto">
+    <source src="audio/Dizzy%20DROS%20-%20NOTA%20(Official%20Music%20Video).mp3" type="audio/mpeg">
+  </audio>
+
   <canvas id="bgCanvas"></canvas>
   <canvas id="fxCanvas"></canvas>
 
@@ -981,7 +986,7 @@
     <div class="dpad-container">
       <button class="dpad-btn btn-up" onclick="movePlayer(0, -1)">▲</button>
       <button class="dpad-btn btn-left" onclick="movePlayer(-1, 0)">◄</button>
-      <button class="dpad-btn btn-right" onclick="movePlayer(1, 0)">►</button>
+      <button class="dpad-btn btn-right" onclick="movePlayer(-1, 0)">►</button>
       <button class="dpad-btn btn-down" onclick="movePlayer(0, 1)">▼</button>
     </div>
 
@@ -1311,7 +1316,14 @@
             <div class="timeline-date">Special Track • Diib</div>
             <div class="timeline-title">Everlasting</div>
             <audio id="diibAudio" controls>
-              <source src="audio/Diib - Everlasting (Prod by Mao Beatz).mp3" type="audio/mpeg">
+              <source src="audio/Diib%20-%20Everlasting%20(Prod%20by%20Mao%20Beatz).mp3" type="audio/mpeg">
+            </audio>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Featured Track • ASSIA</div>
+            <div class="timeline-title">Mélancolique</div>
+            <audio id="assiaAudio" controls>
+              <source src="audio/ASSIA%20-%20M%C3%A9lancolique%20(Visualizer)%20Prod%20by%20Figoshin%20x%20Hackler.mp3" type="audio/mpeg">
             </audio>
           </div>
         </div>
@@ -1333,65 +1345,65 @@
           <div class="photo-card" onclick="openLightbox('images/Photo%2013.jpeg')"><img src="images/Photo%2013.jpeg" alt="Photo 13"></div>
         </div>
 
-        <!-- VIDEO VAULT SECTION -->
+        <!-- VIDEO VAULT SECTION (MUTED BY DEFAULT) -->
         <div class="gallery-title">🎥 Video Vault</div>
         <div class="video-grid">
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/Video%201.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Video 1</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/Video%203.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Video 3</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/Video%206.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Video 6</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/Video%207.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Video 7</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/Video%208.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Video 8</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/video%2061.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Video 61</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/WhatsApp%20Video%202026-09-27%20at%201.17.32%20AM%20(1).mp4" type="video/mp4">
             </video>
             <div class="video-caption">Beach Moment #1</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/WhatsApp%20Video%202026-09-27%20at%201.17.32%20AM.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Night Moment #1</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/WhatsApp%20Video%202026-09-27%20at%201.19.26%20AM%20(1)_squished.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Beach Moment #2</div>
           </div>
           <div class="video-card">
-            <video controls playsinline>
+            <video controls playsinline muted>
               <source src="videos/WhatsApp%20Video%202026-09-27%20at%201.19.26%20AM.mp4" type="video/mp4">
             </video>
             <div class="video-caption">Sun Moment #2</div>
@@ -1403,22 +1415,67 @@
 
       <!-- PHASE 3 -->
       <div class="phase-content" id="phase3">
-        <h1>Phase 3: Happy Birthday! 🎉</h1>
-        <p>Your custom digital feature and birthday letter.</p>
+        <h1>Grand Finale: Happy Birthday & Happy 2 Years Anniversary! 🎉❤️</h1>
+        <p>A message straight from my heart to yours.</p>
 
         <div class="letter-box">
-          <p>Happy Birthday Benti!</p>
+          <p>Happy Birthday Mayhem, et joyeux 2ème anniversaire à nous ! ❤️</p>
           <br>
-          <p>I built this digital package so you would have something permanent, personal, and completely unique to hold onto. Every clue, memory, and audio note here belongs strictly to our 2 years of love and passion.</p>
+          <p>En deux ans, on a traversé tellement de choses... On a connu des hauts incroyables, des moments de pur bonheur, mais aussi des bas extrêmes et des tempêtes où tout semblait plus dur. Je sais que je ne suis pas parfait, et si je t'ai fait souffrir ou douter à certains moments, sache que je le regrette du plus profond de mon cœur. Merci d'être restée forte, d'avoir cru en nous et de ne jamais m'avoir lâché la main.</p>
           <br>
-          <p>Thank you for being my favorite person and best friend. Here's to growing old together!</p>
-          <div class="signature">With all my love,<br>Amine</div>
+          <p>Aujourd'hui, je veux te dire à quel point je suis fier de toi. Tu as obtenu ton diplôme et tu as décroché ton alternance dans une super entreprise en France ! Tu accomplis des choses immenses, toute seule là-bas. Je sais que la solitude peut être lourde par moments, mais n'oublie jamais à quel point tu es puissante, brillante et capable de tout surmonter.</p>
+          <br>
+          <p>Même s'il y a la mer et les kilomètres entre Casablanca et la France, la distance ne gagnera jamais contre nous. Je te fais la promesse solennelle ici : je fais tout ce qui est en mon pouvoir pour te rejoindre très bientôt. On va se retrouver, et on continuera à construire notre histoire côte à côte.</p>
+          <br>
+          <p>Passe la plus belle des journées ma championne. Je t'aime plus que tout au monde, et j'ai hâte d'être près de toi pour célébrer tout ça en vrai.</p>
+          <div class="signature">Pour toujours ton homme,<br>Amine</div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    /* AUTOMATIC BACKGROUND AUDIO CONTROLLER (DIZZY DROS -> DIIB) */
+    const bgIntroAudio = document.getElementById('bgIntroAudio');
+    let introAudioStarted = false;
+
+    function startIntroAudio() {
+      if (!introAudioStarted && bgIntroAudio) {
+        bgIntroAudio.volume = 1.0;
+        bgIntroAudio.play().then(() => {
+          introAudioStarted = true;
+        }).catch(err => {
+          console.log('Autoplay deferred until user interaction:', err);
+        });
+      }
+    }
+
+    // Start Dizzy DROS on any keypress or touch
+    window.addEventListener('click', startIntroAudio, { once: true });
+    window.addEventListener('keydown', startIntroAudio, { once: true });
+    window.addEventListener('touchstart', startIntroAudio, { once: true });
+
+    function fadeOutIntroAudio(durationMs, callback) {
+      if (!bgIntroAudio || bgIntroAudio.paused) {
+        if (callback) callback();
+        return;
+      }
+      const stepMs = 50;
+      const steps = durationMs / stepMs;
+      const volumeStep = bgIntroAudio.volume / steps;
+
+      const fadeInterval = setInterval(() => {
+        if (bgIntroAudio.volume > volumeStep) {
+          bgIntroAudio.volume -= volumeStep;
+        } else {
+          bgIntroAudio.volume = 0;
+          bgIntroAudio.pause();
+          clearInterval(fadeInterval);
+          if (callback) callback();
+        }
+      }, stepMs);
+    }
+
     /* PUZZLE MAZE LOGIC */
     let mazeMap = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -1540,6 +1597,7 @@
     }
 
     function movePlayer(dx, dy) {
+      startIntroAudio();
       const newX = playerPos.x + dx;
       const newY = playerPos.y + dy;
 
@@ -1842,6 +1900,7 @@
     resizeCanvas();
 
     function handlePointerMove(clientX, clientY) {
+      startIntroAudio();
       if (!document.body.classList.contains('in-card') || !cursorAvatar) return;
 
       cursorAvatar.style.left = `${clientX}px`;
@@ -2011,6 +2070,9 @@
       const loader = document.getElementById('loadingOverlay2');
       const progressFill = document.getElementById('progressFill2');
       
+      // Fade out Dizzy DROS over 3.5 seconds during loading screen
+      fadeOutIntroAudio(3500);
+
       if (loader && progressFill) {
         progressFill.style.transition = 'none';
         progressFill.style.width = '0%';
