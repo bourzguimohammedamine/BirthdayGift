@@ -233,6 +233,7 @@
       width: 90%;
       height: 90%;
       image-rendering: pixelated;
+      cursor: pointer;
     }
 
     /* D-PAD MOBILE CONTROLS */
@@ -268,6 +269,30 @@
     .btn-left { grid-column: 1; grid-row: 2; }
     .btn-right { grid-column: 3; grid-row: 2; }
     .btn-down { grid-column: 2; grid-row: 3; }
+
+    /* SECRET SKIP BUTTON STYLES */
+    .skip-btn {
+      display: none;
+      margin-top: 15px;
+      padding: 8px 16px;
+      background: rgba(244, 63, 94, 0.2);
+      border: 1px solid var(--accent-color);
+      color: var(--text-main);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      animation: fadeIn 0.3s ease;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .skip-btn:hover {
+      background: var(--accent-color);
+    }
+
+    .skip-btn:active {
+      transform: scale(0.95);
+    }
 
     /* CUSTOM WIN POPUP MODAL SCREEN */
     .win-popup-overlay {
@@ -724,8 +749,8 @@
 
     .photo-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
       margin-bottom: 30px;
     }
 
@@ -737,6 +762,7 @@
       border: 2px solid var(--border-color);
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
       transition: transform 0.3s ease, border-color 0.3s ease;
+      cursor: pointer;
     }
 
     .photo-card:hover {
@@ -749,6 +775,44 @@
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    /* VIDEO GALLERY GRID STYLES */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .video-card {
+      background-color: var(--bg-color);
+      border: 2px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .video-card:hover {
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+
+    .video-card video {
+      width: 100%;
+      display: block;
+      border-bottom: 1px solid var(--border-color);
+      background-color: #000;
+      max-height: 280px;
+      object-fit: contain;
+    }
+
+    .video-caption {
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      font-weight: 600;
     }
 
     /* FULL-SCREEN LIGHTBOX MODAL */
@@ -920,6 +984,9 @@
       <button class="dpad-btn btn-right" onclick="movePlayer(1, 0)">►</button>
       <button class="dpad-btn btn-down" onclick="movePlayer(0, 1)">▼</button>
     </div>
+
+    <!-- SECRET SKIP BUTTON -->
+    <button id="skipBtn" class="skip-btn" onclick="skipMaze()">⚡ Skip Mini-Game</button>
   </div>
 
   <!-- STAGE 2: MAIN BIRTHDAY CARD -->
@@ -1236,42 +1303,94 @@
       <!-- PHASE 2 -->
       <div class="phase-content" id="phase2">
         <h1>Phase 2: Our Memory Vault 📸</h1>
-        <p>Access granted! Here is a curated timeline of our 2 years together, complete with voice notes and photos.</p>
+        <p>Access granted! Here is a curated timeline of our memories, audio notes, photos, and video clips.</p>
 
+        <!-- AUDIO / VOICE NOTES SECTION -->
         <div class="timeline">
           <div class="timeline-item">
-            <div class="timeline-date">Chapter I • First Met</div>
-            <div class="timeline-title">Where It All Began</div>
-            <p>The moment we met and realized we could talk for hours without getting bored.</p>
-            <audio controls>
-              <source src="audio/voice_note_1.mp3" type="audio/mpeg">
-            </audio>
-          </div>
-
-          <div class="timeline-item">
-            <div class="timeline-date">Chapter II • 2 Years of Memories</div>
-            <div class="timeline-title">Late Night Talks & Motorcycle Rides</div>
-            <p>Listen to this short audio message recorded specifically for this moment:</p>
-            <audio controls>
-              <source src="audio/voice_note_2.mp3" type="audio/mpeg">
+            <div class="timeline-date">Special Track • Diib</div>
+            <div class="timeline-title">Everlasting</div>
+            <audio id="diibAudio" controls>
+              <source src="audio/Diib - Everlasting (Prod by Mao Beatz).mp3" type="audio/mpeg">
             </audio>
           </div>
         </div>
 
         <!-- PHOTO GALLERY GRID -->
-        <div class="gallery-title">🖼️ Our Favorite Moments</div>
+        <div class="gallery-title">🖼️ Our Photo Gallery</div>
         <div class="photo-grid">
-          <div class="photo-card" onclick="openLightbox('images/photo1.jpg')">
-            <img src="images/photo1.jpg" alt="Memory 1" onerror="this.src='https://via.placeholder.com/300/161b22/f43f5e?text=Photo+1'">
+          <div class="photo-card" onclick="openLightbox('images/Photo%200.jpeg')"><img src="images/Photo%200.jpeg" alt="Photo 0"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%201.jpeg')"><img src="images/Photo%201.jpeg" alt="Photo 1"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%202.jpeg')"><img src="images/Photo%202.jpeg" alt="Photo 2"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%203.jpeg')"><img src="images/Photo%203.jpeg" alt="Photo 3"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%204.jpeg')"><img src="images/Photo%204.jpeg" alt="Photo 4"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%205.jpeg')"><img src="images/Photo%205.jpeg" alt="Photo 5"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%206.jpeg')"><img src="images/Photo%206.jpeg" alt="Photo 6"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%207.jpeg')"><img src="images/Photo%207.jpeg" alt="Photo 7"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%208.jpeg')"><img src="images/Photo%208.jpeg" alt="Photo 8"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%209.jpeg')"><img src="images/Photo%209.jpeg" alt="Photo 9"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%2010.jpeg')"><img src="images/Photo%2010.jpeg" alt="Photo 10"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%2011.jpeg')"><img src="images/Photo%2011.jpeg" alt="Photo 11"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%2013.jpeg')"><img src="images/Photo%2013.jpeg" alt="Photo 13"></div>
+          <div class="photo-card" onclick="openLightbox('images/Photo%2061.jpeg')"><img src="images/Photo%2061.jpeg" alt="Photo 61"></div>
+        </div>
+
+        <!-- VIDEO VAULT SECTION -->
+        <div class="gallery-title">🎥 Video Vault</div>
+        <div class="video-grid">
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/Video%201.mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Video 1</div>
           </div>
-          <div class="photo-card" onclick="openLightbox('images/photo2.jpg')">
-            <img src="images/photo2.jpg" alt="Memory 2" onerror="this.src='https://via.placeholder.com/300/161b22/f43f5e?text=Photo+2'">
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/Video%203.mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Video 3</div>
           </div>
-          <div class="photo-card" onclick="openLightbox('images/photo3.jpg')">
-            <img src="images/photo3.jpg" alt="Memory 3" onerror="this.src='https://via.placeholder.com/300/161b22/f43f5e?text=Photo+3'">
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/Video%206.mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Video 6</div>
           </div>
-          <div class="photo-card" onclick="openLightbox('images/photo4.jpg')">
-            <img src="images/photo4.jpg" alt="Memory 4" onerror="this.src='https://via.placeholder.com/300/161b22/f43f5e?text=Photo+4'">
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/Video%207.mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Video 7</div>
+          </div>
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/Video%208.mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Video 8</div>
+          </div>
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/WhatsApp%20Video%202026-09-27%20at%201.17.32%20AM%20(1).mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Beach Moment #1</div>
+          </div>
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/WhatsApp%20Video%202026-09-27%20at%201.17.32%20AM.mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Night Moment #1</div>
+          </div>
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/WhatsApp%20Video%202026-09-27%20at%201.19.26%20AM%20(1).mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Beach Moment #2</div>
+          </div>
+          <div class="video-card">
+            <video controls playsinline>
+              <source src="videos/WhatsApp%20Video%202026-09-27%20at%201.19.26%20AM.mp4" type="video/mp4">
+            </video>
+            <div class="video-caption">Sun Moment #2</div>
           </div>
         </div>
 
@@ -1325,9 +1444,10 @@
     let chaserRemovedPermanently = false;
     let chaserPos = { x: 1, y: 1 };
     let chaserInterval = null;
+    let avatarClickCount = 0;
 
     const girlSvgIcon = `
-      <svg class="maze-avatar-icon" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="maze-avatar-icon" onclick="handleAvatarClick(event)" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="9" y="6" width="14" height="14" fill="#3D231A"/>
         <rect x="12" y="24" width="3" height="7" fill="#E8AA7A"/>
         <rect x="17" y="24" width="3" height="7" fill="#E8AA7A"/>
@@ -1354,6 +1474,23 @@
         <rect x="20" y="8" width="3" height="8" fill="#3D231A"/>
       </svg>
     `;
+
+    function handleAvatarClick(e) {
+      if (e) e.stopPropagation();
+      avatarClickCount++;
+      if (avatarClickCount >= 3) {
+        const skipBtn = document.getElementById('skipBtn');
+        if (skipBtn) skipBtn.style.display = 'block';
+      }
+    }
+
+    function skipMaze() {
+      clearInterval(chaserInterval);
+      chaserActive = false;
+      triggerExplosion(window.innerWidth / 2, window.innerHeight / 2);
+      const winModal = document.getElementById('winPopup');
+      if (winModal) winModal.classList.add('active');
+    }
 
     function renderMaze() {
       const board = document.getElementById('mazeBoard');
@@ -1938,6 +2075,10 @@
         if (badge1) badge1.classList.add('active');
       } else if (targetId === 'phase2') {
         if (badge2) badge2.classList.add('active');
+        const audio = document.getElementById('diibAudio');
+        if (audio) {
+          audio.play().catch(e => console.log('Autoplay blocked:', e));
+        }
       } else if (targetId === 'phase3') {
         if (badge3) badge3.classList.add('active');
       }
