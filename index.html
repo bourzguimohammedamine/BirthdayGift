@@ -746,7 +746,7 @@
     .input-group { margin-bottom: 20px; }
     label { display: block; font-size: 1.05rem; margin-bottom: 12px; color: var(--text-main); font-weight: 600; line-height: 1.5; }
 
-    input[type="text"] {
+    input[type="text"], input[type="password"] {
       width: 100%;
       padding: 12px 16px;
       background-color: var(--bg-color);
@@ -757,7 +757,7 @@
       outline: none;
     }
 
-    input[type="text"]:focus { border-color: var(--accent-color); }
+    input[type="text"]:focus, input[type="password"]:focus { border-color: var(--accent-color); }
 
     button.std-btn {
       width: 100%;
@@ -773,6 +773,25 @@
     }
 
     button.std-btn:active { transform: scale(0.98); }
+
+    button.secondary-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: transparent;
+      color: var(--text-muted);
+      border: 1px dashed var(--border-color);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 10px;
+      cursor: pointer !important;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    button.secondary-btn:hover {
+      border-color: var(--accent-color);
+      color: var(--text-main);
+    }
 
     .q3-choice-container {
       display: flex;
@@ -1047,7 +1066,7 @@
       <div class="play-overlay" id="playOverlay" onclick="startIntroVideoManual()">
         Tap to start video 🎬
       </div>
-      <video id="introVideo" playsinline preload="auto">
+      <video id="introVideo" playsinline preload="auto" autoplay>
         <source src="videos/Birthday23.mp4" type="video/mp4">
         Your browser does not support video playback.
       </video>
@@ -1341,7 +1360,7 @@
           <input type="text" id="ans1" placeholder="Type your answer..." autocomplete="off">
           <div class="error-msg" id="err1">Try again hbiba! 😉</div>
         </div>
-        <button class="std-btn" onclick="checkQuestion(1, ['casa', 'casablanca', 'dar baida', 'bf\'s city', '9lbk'], 'p1-q2', event)">Next Memory →</button>
+        <button class="std-btn" onclick="checkQuestion(1, null, 'p1-q2', event)">Next Memory →</button>
       </div>
 
       <!-- QUESTION 2 -->
@@ -1353,7 +1372,7 @@
           <input type="text" id="ans2" placeholder="Type your answer..." autocomplete="off">
           <div class="error-msg" id="err2">Try again! You know this word... 🤔</div>
         </div>
-        <button class="std-btn" onclick="checkQuestion(2, ['ash', 'daghi', 'o', 'kochi', 'makich', 'kahma9 elik'], 'p1-q3', event)">Next Memory →</button>
+        <button class="std-btn" onclick="checkQuestion(2, null, 'p1-q3', event)">Next Memory →</button>
       </div>
 
       <!-- QUESTION 3 -->
@@ -1376,8 +1395,24 @@
         <div class="input-group">
           <label for="ans4">Thank god you said yes, now i want you to type in what's the most wanted gift you ever wish for (a part dheb a hbiba stp)</label>
           <input type="text" id="ans4" placeholder="Type anything you want..." autocomplete="off">
+          <div class="error-msg" id="err4">Type a bit more details hbiba (at least 4 characters)! ❤️</div>
         </div>
-        <button class="std-btn" onclick="triggerPage2Loading('phase2', event)">Unlock Memory Vault →</button>
+        <button class="std-btn" onclick="checkQuestion(4, null, 'vault-lock', event)">Unlock Memory Vault →</button>
+      </div>
+
+      <!-- MEMORY VAULT PASSWORD LOCK SCREEN -->
+      <div class="phase-content" id="vault-lock">
+        <h2>🔒 Vault Security Gate</h2>
+        <p>The Memory Vault is password protected. Enter the password or skip directly to the Grand Finale.</p>
+        
+        <div class="input-group">
+          <label for="vaultPass">Enter Vault Password:</label>
+          <input type="password" id="vaultPass" placeholder="Enter password..." autocomplete="off">
+          <div class="error-msg" id="errVault">Incorrect password hbiba! 🔐</div>
+        </div>
+
+        <button class="std-btn" onclick="unlockVault(event)">Unlock Vault 🔓</button>
+        <button class="secondary-btn" onclick="triggerNext('phase3', event)">Skip to Grand Finale 💌 →</button>
       </div>
 
       <!-- PHASE 2 -->
@@ -1561,15 +1596,21 @@
         });
       }
 
+      /* STAGE 0 INTRO VIDEO AUTOPLAY WITH SOUND HANDLING */
       const introVideo = document.getElementById('introVideo');
       if (introVideo) {
         introVideo.volume = 1.0;
-        setTimeout(() => {
-          introVideo.play().then(() => {
+        introVideo.muted = false;
+
+        const playPromise = introVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
             const overlay = document.getElementById('playOverlay');
             if (overlay) overlay.style.display = 'none';
-          }).catch(err => console.log("Video autoplay blocked:", err));
-        }, 1500);
+          }).catch(err => {
+            console.log("Browser policy blocked unmuted autoplay. Showing tap overlay.", err);
+          });
+        }
 
         introVideo.addEventListener('ended', () => {
           triggerMassiveCelebration();
@@ -1584,6 +1625,7 @@
       const introVideo = document.getElementById('introVideo');
       const overlay = document.getElementById('playOverlay');
       if (introVideo) {
+        introVideo.muted = false;
         introVideo.volume = 1.0;
         introVideo.play().then(() => {
           if (overlay) overlay.style.display = 'none';
@@ -1617,18 +1659,44 @@
       }).catch(err => console.error("Error sending answers:", err));
     }
 
+    /* VALIDATION & CHECK FOR QUESTIONS 1, 2, AND 4 */
     function checkQuestion(qNum, validAnswers, nextStep, evt) {
       const inputEl = document.getElementById('ans' + qNum);
-      const val = inputEl ? inputEl.value.trim().toLowerCase() : '';
+      const rawVal = inputEl ? inputEl.value.trim() : '';
+      const val = rawVal.toLowerCase();
       const errEl = document.getElementById('err' + qNum);
+      let isValid = false;
 
-      if (validAnswers.includes(val) || val.length > 0) {
+      if (qNum === 1) {
+        // Question 1: Must be Casablanca or Casa
+        if (val === 'casablanca' || val === 'casa') {
+          isValid = true;
+          userAnswers.ans1 = rawVal;
+        }
+      } else if (qNum === 2) {
+        // Question 2: Specific allowed terms & inclusions
+        const exactMatches = ['daghi', 'ash', 'ach', 'makich', 'kouchi', 'koushi', 'makish'];
+        if (
+          exactMatches.includes(val) || 
+          val.includes('kahma') || 
+          val.includes('baba') || 
+          val.includes('wini')
+        ) {
+          isValid = true;
+          userAnswers.ans2 = rawVal;
+        }
+      } else if (qNum === 4) {
+        // Question 4: Anything > 3 letters
+        if (rawVal.length > 3) {
+          isValid = true;
+          userAnswers.ans4 = rawVal;
+          // Send all collected responses directly to Google Sheet
+          sendAnswersToGoogleSheet();
+        }
+      }
+
+      if (isValid) {
         if (errEl) errEl.style.display = 'none';
-        
-        // Store answer
-        if (qNum === 1) userAnswers.ans1 = inputEl.value.trim();
-        if (qNum === 2) userAnswers.ans2 = inputEl.value.trim();
-
         fastTransition(nextStep, evt);
       } else {
         if (errEl) errEl.style.display = 'block';
@@ -1636,13 +1704,23 @@
       }
     }
 
+    /* VAULT UNLOCK FUNCTION */
+    function unlockVault(evt) {
+      const passInput = document.getElementById('vaultPass');
+      const errEl = document.getElementById('errVault');
+      const val = passInput ? passInput.value.trim() : '';
+
+      // Set your vault password here (or allow any password if needed)
+      if (val.length > 0) {
+        if (errEl) errEl.style.display = 'none';
+        triggerNext('phase2', evt);
+      } else {
+        if (errEl) errEl.style.display = 'block';
+        danceBox();
+      }
+    }
+
     function triggerPage2Loading(targetId, evt) {
-      const input4 = document.getElementById('ans4');
-      if (input4) userAnswers.ans4 = input4.value.trim();
-
-      // Submit all answers live to your sheet
-      sendAnswersToGoogleSheet();
-
       danceBox();
       if (evt) triggerExplosion(evt.clientX || window.innerWidth / 2, evt.clientY || window.innerHeight / 2);
 
@@ -2320,7 +2398,7 @@
       if (badge2) badge2.classList.remove('active');
       if (badge3) badge3.classList.remove('active');
 
-      if (targetId.startsWith('p1')) {
+      if (targetId.startsWith('p1') || targetId === 'vault-lock') {
         if (badge1) badge1.classList.add('active');
       } else if (targetId === 'phase2') {
         if (badge2) badge2.classList.add('active');
