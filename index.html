@@ -171,7 +171,7 @@
     }
 
     .video-title {
-      font-family: 'Dancing Script', cursive, cursive;
+      font-family: 'Dancing Script', cursive;
       font-size: 1.8rem;
       font-weight: 700;
       color: #fda4af;
@@ -197,6 +197,23 @@
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    .play-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(13, 17, 23, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 5;
+      text-align: center;
+      padding: 20px;
+      backdrop-filter: blur(4px);
     }
 
     /* STAGE 1: HARD MAZE MINI-GAME SCREEN */
@@ -299,7 +316,6 @@
       cursor: pointer;
     }
 
-    /* D-PAD MOBILE CONTROLS */
     .dpad-container {
       display: grid;
       grid-template-columns: repeat(3, 46px);
@@ -333,7 +349,6 @@
     .btn-right { grid-column: 3; grid-row: 2; }
     .btn-down { grid-column: 2; grid-row: 3; }
 
-    /* SECRET SKIP BUTTON STYLES */
     .skip-btn {
       display: none;
       margin-top: 15px;
@@ -349,15 +364,10 @@
       transition: background 0.2s, transform 0.1s;
     }
 
-    .skip-btn:hover {
-      background: var(--accent-color);
-    }
+    .skip-btn:hover { background: var(--accent-color); }
+    .skip-btn:active { transform: scale(0.95); }
 
-    .skip-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* CUSTOM WIN POPUP MODAL SCREEN */
+    /* WIN POPUP MODAL SCREEN */
     .win-popup-overlay {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -389,9 +399,7 @@
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .win-popup-overlay.active .win-popup-card {
-      transform: scale(1);
-    }
+    .win-popup-overlay.active .win-popup-card { transform: scale(1); }
 
     .win-avatar-box {
       width: 70px;
@@ -666,7 +674,6 @@
     }
 
     .gift-btn.unlocked { pointer-events: auto !important; }
-
     .gift-btn-container.piece-shake { animation: pieceShake 0.15s ease-in-out; }
 
     @keyframes pieceShake {
@@ -767,7 +774,6 @@
 
     button.std-btn:active { transform: scale(0.98); }
 
-    /* QUESTION 3: EXTRA WIDE YES & TINY NO BUTTON */
     .q3-choice-container {
       display: flex;
       align-items: center;
@@ -799,7 +805,6 @@
     .error-msg { color: #fb7185; font-size: 0.85rem; margin-top: 8px; display: none; }
     .progress-bar-text { font-size: 0.8rem; color: var(--accent-color); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
 
-    /* PHOTO GALLERY GRID STYLES */
     .gallery-title {
       font-size: 1.2rem;
       font-weight: 700;
@@ -840,7 +845,6 @@
       display: block;
     }
 
-    /* VIDEO GALLERY GRID STYLES */
     .video-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -878,7 +882,6 @@
       font-weight: 600;
     }
 
-    /* FULL-SCREEN LIGHTBOX MODAL */
     .lightbox-modal {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -910,7 +913,6 @@
       user-select: none;
     }
 
-    /* LOADING SCREEN STYLES */
     .loading-overlay {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -1042,7 +1044,10 @@
   <div id="videoStage">
     <div class="video-title">Happy 23th Birthday to my most precious girl ✨</div>
     <div class="video-container-916">
-      <video id="introVideo" playsinline muted preload="auto">
+      <div class="play-overlay" id="playOverlay" onclick="startIntroVideoManual()">
+        Tap to start video 🎬
+      </div>
+      <video id="introVideo" playsinline preload="auto">
         <source src="videos/Birthday23.mp4" type="video/mp4">
         Your browser does not support video playback.
       </video>
@@ -1064,7 +1069,6 @@
       <button class="dpad-btn btn-down" onclick="movePlayer(0, 1)">▼</button>
     </div>
 
-    <!-- SECRET SKIP BUTTON -->
     <button id="skipBtn" class="skip-btn" onclick="skipMaze()">⚡ Skip Mini-Game</button>
   </div>
 
@@ -1072,7 +1076,6 @@
   <div id="cardStage">
     <div id="cursorAvatar" class="idle facing-right">
       <div class="avatar-inner">
-        <!-- FRONT-FACING SVG -->
         <svg class="avatar-svg avatar-front" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
           <rect x="9" y="6" width="14" height="14" fill="#3D231A"/>
           <g class="girl-legs-front">
@@ -1117,7 +1120,6 @@
           </g>
         </svg>
 
-        <!-- SIDE-PROFILE WALKING SVG -->
         <svg class="avatar-svg avatar-side" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
           <path d="M10 6H20V20H10V6Z" fill="#3D231A"/>
           <path d="M8 10H14V22H8V10Z" fill="#3D231A"/>
@@ -1153,7 +1155,6 @@
           </g>
         </svg>
 
-        <!-- KNEELING SIDE SVG -->
         <svg class="avatar-svg avatar-kneel" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; image-rendering: pixelated;">
           <path d="M10 12H20V26H10V12Z" fill="#3D231A"/>
           <g class="kneel-legs">
@@ -1238,7 +1239,7 @@
       </div>
     </div>
 
-    <!-- LOADING OVERLAY SCREEN 2 (BLACK DRESS & HIGH HEELS) -->
+    <!-- LOADING OVERLAY SCREEN 2 -->
     <div class="loading-overlay" id="loadingOverlay2">
       <div class="walking-track">
         <div class="avatar-wrapper">
@@ -1384,7 +1385,6 @@
         <h1>Phase 2: Our Memory Vault 📸</h1>
         <p>Access granted! Here is a curated timeline of our memories, audio notes, photos, and video clips.</p>
 
-        <!-- AUDIO / VOICE NOTES SECTION -->
         <div class="timeline">
           <div class="timeline-item">
             <div class="timeline-date">Special Track • Diib</div>
@@ -1402,7 +1402,6 @@
           </div>
         </div>
 
-        <!-- PHOTO GALLERY GRID -->
         <div class="gallery-title">🖼️ Our Photo Gallery</div>
         <div class="photo-grid">
           <div class="photo-card" onclick="openLightbox('images/Photo%200.jpeg')"><img src="images/Photo%200.jpeg" alt="Photo 0"></div>
@@ -1419,7 +1418,6 @@
           <div class="photo-card" onclick="openLightbox('images/Photo%2013.jpeg')"><img src="images/Photo%2013.jpeg" alt="Photo 13"></div>
         </div>
 
-        <!-- VIDEO VAULT SECTION (MUTED BY DEFAULT) -->
         <div class="gallery-title">🎥 Video Vault</div>
         <div class="video-grid">
           <div class="video-card">
@@ -1509,7 +1507,17 @@
   </div>
 
   <script>
-    /* AUTOMATIC BACKGROUND AUDIO CONTROLLER (DIZZY DROS -> DIIB) */
+    // GOOGLE APPS SCRIPT INTEGRATION URL
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzB99VsRP_6gsiclOfx1dAGNKwMdGMs8QDl9KfIejWIrMWEbjqJMk348QUJi9zIzQHu/exec";
+
+    // Object to store her answers locally
+    const userAnswers = {
+      ans1: '',
+      ans2: '',
+      ans4: ''
+    };
+
+    /* AUTOMATIC BACKGROUND AUDIO CONTROLLER */
     const bgIntroAudio = document.getElementById('bgIntroAudio');
     let introAudioStarted = false;
 
@@ -1518,16 +1526,9 @@
         bgIntroAudio.volume = 1.0;
         bgIntroAudio.play().then(() => {
           introAudioStarted = true;
-        }).catch(err => {
-          console.log('Autoplay deferred until user interaction:', err);
-        });
+        }).catch(err => console.log('Autoplay deferred:', err));
       }
     }
-
-    // Start Dizzy DROS on any keypress or touch
-    window.addEventListener('click', startIntroAudio, { once: true });
-    window.addEventListener('keydown', startIntroAudio, { once: true });
-    window.addEventListener('touchstart', startIntroAudio, { once: true });
 
     function fadeOutIntroAudio(durationMs, callback) {
       if (!bgIntroAudio || bgIntroAudio.paused) {
@@ -1550,7 +1551,6 @@
       }, stepMs);
     }
 
-    /* AUTOMATIC SEQUENCING: DIIB ENDS -> LABESS STARTS */
     document.addEventListener('DOMContentLoaded', () => {
       const diibTrack = document.getElementById('diibAudio');
       const labessTrack = document.getElementById('labessAudio');
@@ -1561,16 +1561,14 @@
         });
       }
 
-      /* STAGE 0 INTRO VIDEO AUTO LAUNCH & TRANSITION */
       const introVideo = document.getElementById('introVideo');
       if (introVideo) {
+        introVideo.volume = 1.0;
         setTimeout(() => {
           introVideo.play().then(() => {
-            startIntroAudio();
-          }).catch(err => {
-            console.log("Video play deferred:", err);
-            startIntroAudio();
-          });
+            const overlay = document.getElementById('playOverlay');
+            if (overlay) overlay.style.display = 'none';
+          }).catch(err => console.log("Video autoplay blocked:", err));
         }, 1500);
 
         introVideo.addEventListener('ended', () => {
@@ -1582,6 +1580,17 @@
       }
     });
 
+    function startIntroVideoManual() {
+      const introVideo = document.getElementById('introVideo');
+      const overlay = document.getElementById('playOverlay');
+      if (introVideo) {
+        introVideo.volume = 1.0;
+        introVideo.play().then(() => {
+          if (overlay) overlay.style.display = 'none';
+        });
+      }
+    }
+
     function transitionVideoToMaze() {
       const videoStage = document.getElementById('videoStage');
       const mazeStage = document.getElementById('mazeStage');
@@ -1590,7 +1599,78 @@
       setTimeout(() => {
         if (videoStage) videoStage.style.display = 'none';
         if (mazeStage) mazeStage.classList.add('active');
+        startIntroAudio();
       }, 600);
+    }
+
+    /* SEND ANSWERS TO GOOGLE SHEET */
+    function sendAnswersToGoogleSheet() {
+      if (!GOOGLE_SHEET_URL) return;
+
+      fetch(GOOGLE_SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userAnswers)
+      }).then(() => {
+        console.log("Answers sent successfully to Google Sheet!");
+      }).catch(err => console.error("Error sending answers:", err));
+    }
+
+    function checkQuestion(qNum, validAnswers, nextStep, evt) {
+      const inputEl = document.getElementById('ans' + qNum);
+      const val = inputEl ? inputEl.value.trim().toLowerCase() : '';
+      const errEl = document.getElementById('err' + qNum);
+
+      if (validAnswers.includes(val) || val.length > 0) {
+        if (errEl) errEl.style.display = 'none';
+        
+        // Store answer
+        if (qNum === 1) userAnswers.ans1 = inputEl.value.trim();
+        if (qNum === 2) userAnswers.ans2 = inputEl.value.trim();
+
+        fastTransition(nextStep, evt);
+      } else {
+        if (errEl) errEl.style.display = 'block';
+        danceBox();
+      }
+    }
+
+    function triggerPage2Loading(targetId, evt) {
+      const input4 = document.getElementById('ans4');
+      if (input4) userAnswers.ans4 = input4.value.trim();
+
+      // Submit all answers live to your sheet
+      sendAnswersToGoogleSheet();
+
+      danceBox();
+      if (evt) triggerExplosion(evt.clientX || window.innerWidth / 2, evt.clientY || window.innerHeight / 2);
+
+      const loader = document.getElementById('loadingOverlay2');
+      const progressFill = document.getElementById('progressFill2');
+      
+      fadeOutIntroAudio(3500);
+
+      if (loader && progressFill) {
+        progressFill.style.transition = 'none';
+        progressFill.style.width = '0%';
+        
+        document.body.classList.add('is-loading');
+        loader.classList.add('active');
+
+        setTimeout(() => {
+          progressFill.style.transition = 'width 5s linear';
+          progressFill.style.width = '100%';
+        }, 50);
+
+        setTimeout(() => {
+          showStep(targetId);
+          loader.classList.remove('active');
+          document.body.classList.remove('is-loading');
+        }, 5000);
+      } else {
+        showStep(targetId);
+      }
     }
 
     /* PUZZLE MAZE LOGIC */
@@ -1616,7 +1696,6 @@
 
     let playerPos = { x: 1, y: 1 };
     const goalPos = { x: 15, y: 15 };
-    
     let moveCount = 0;
     let chaserActive = false;
     let chaserRemovedPermanently = false;
@@ -1714,7 +1793,6 @@
     }
 
     function movePlayer(dx, dy) {
-      startIntroAudio();
       const newX = playerPos.x + dx;
       const newY = playerPos.y + dy;
 
@@ -2038,7 +2116,6 @@
     resizeCanvas();
 
     function handlePointerMove(clientX, clientY) {
-      startIntroAudio();
       if (!document.body.classList.contains('in-card') || !cursorAvatar) return;
 
       cursorAvatar.style.left = `${clientX}px`;
@@ -2201,38 +2278,6 @@
       showStep(targetId);
     }
 
-    function triggerPage2Loading(targetId, evt) {
-      danceBox();
-      if (evt) triggerExplosion(evt.clientX || window.innerWidth / 2, evt.clientY || window.innerHeight / 2);
-
-      const loader = document.getElementById('loadingOverlay2');
-      const progressFill = document.getElementById('progressFill2');
-      
-      // Fade out Dizzy DROS over 3.5 seconds during loading screen
-      fadeOutIntroAudio(3500);
-
-      if (loader && progressFill) {
-        progressFill.style.transition = 'none';
-        progressFill.style.width = '0%';
-        
-        document.body.classList.add('is-loading');
-        loader.classList.add('active');
-
-        setTimeout(() => {
-          progressFill.style.transition = 'width 5s linear';
-          progressFill.style.width = '100%';
-        }, 50);
-
-        setTimeout(() => {
-          showStep(targetId);
-          loader.classList.remove('active');
-          document.body.classList.remove('is-loading');
-        }, 5000);
-      } else {
-        showStep(targetId);
-      }
-    }
-
     function triggerNext(targetId, evt) {
       danceBox();
       if (evt) triggerExplosion(evt.clientX || window.innerWidth / 2, evt.clientY || window.innerHeight / 2);
@@ -2288,20 +2333,6 @@
       }
     }
 
-    function checkQuestion(qNum, validAnswers, nextStep, evt) {
-      const inputEl = document.getElementById('ans' + qNum);
-      const val = inputEl ? inputEl.value.trim().toLowerCase() : '';
-      const errEl = document.getElementById('err' + qNum);
-
-      if (validAnswers.includes(val) || val.length > 0) {
-        if (errEl) errEl.style.display = 'none';
-        fastTransition(nextStep, evt);
-      } else {
-        if (errEl) errEl.style.display = 'block';
-        danceBox();
-      }
-    }
-
     function dodgeNoButton() {
       const noBtn = document.getElementById('noBtn');
       const container = document.getElementById('q3Box');
@@ -2319,7 +2350,6 @@
       noBtn.style.top = `${randomY}px`;
     }
 
-    /* LIGHTBOX LOGIC */
     function openLightbox(src) {
       const img = document.getElementById('lightboxImg');
       const modal = document.getElementById('lightboxModal');
